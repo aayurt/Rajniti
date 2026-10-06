@@ -2,6 +2,8 @@ import { useReducer } from 'react';
 import { TILES } from '../data/tiles';
 import { useGame } from '../game/store';
 import { TradeModal, tradeReducer, initialTradeState } from './TradeModal';
+import { tradeCopy } from './panels/copy';
+import { sortPlayersWithHostFirst, formatCash } from './panels/players';
 
 export default function RightPanel() {
   const { state, dispatch } = useGame();
@@ -26,28 +28,31 @@ export default function RightPanel() {
       </button>
 
       <div className="bg-panel border border-edge rounded-xl p-2 mt-9">
-        {state.players.map((p, i) => (
-          <div
-            key={p.id}
-            className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-[10px] relative ${
-              i === state.current ? 'bg-tile' : ''
-            } ${p.isOut ? 'opacity-40' : ''}`}
-          >
-            {i === state.current && (
-              <div className="absolute left-0 top-2 bottom-2 w-1 rounded bg-[#ffcf3f]" />
-            )}
+        {sortPlayersWithHostFirst(state.players).map((p) => {
+          const isCurrent = state.players.indexOf(p) === state.current;
+          return (
             <div
-              className="w-[30px] h-[30px] rounded-full flex items-center justify-center text-base flex-shrink-0"
-              style={{ background: p.color }}
+              key={p.id}
+              className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-[10px] relative ${
+                isCurrent ? 'bg-tile' : ''
+              } ${p.isOut ? 'opacity-40' : ''}`}
             >
-              👀
+              {isCurrent && (
+                <div className="absolute left-0 top-2 bottom-2 w-1 rounded bg-[#ffcf3f]" />
+              )}
+              <div
+                className="w-[30px] h-[30px] rounded-full flex items-center justify-center text-base flex-shrink-0"
+                style={{ background: p.color }}
+              >
+                👀
+              </div>
+              <div className="flex-1 text-[13px]">
+                {p.name} {p.isOwner && <span className="ml-1 bg-[#1a1830] border border-[#2b2850] text-[#8f8aa8] text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Host</span>} {p.isOut && <span className="text-fog">(out)</span>}
+              </div>
+              <div className="text-[13px] text-right">{formatCash(p.cash)}</div>
             </div>
-            <div className="flex-1 text-[13px]">
-              {p.name} {p.isOwner && <span>👑</span>} {p.isOut && <span className="text-fog">(out)</span>}
-            </div>
-            <div className="text-[13px]">${p.cash}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="bg-panel border border-edge rounded-xl p-3.5">
@@ -62,14 +67,13 @@ export default function RightPanel() {
         </div>
         {state.tradeHint && (
           <div className="bg-tile rounded-lg p-3 text-center text-xs text-fog">
-            ⓘ Make trades with other players to exchange properties, money and bonus cards. Use the
-            “Create” button to create a new trade.
+            {tradeCopy.explainer}
             <div>
               <button
                 onClick={() => dispatch({ type: 'DISMISS_TRADE_HINT' })}
                 className="mt-2 bg-panel border border-line rounded-md px-3 py-1.5 text-xs min-h-[36px]"
               >
-                ✓ Got it
+                {tradeCopy.gotIt}
               </button>
             </div>
           </div>

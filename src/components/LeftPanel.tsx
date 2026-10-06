@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '../game/store';
+import { shareCopy, adblockCopy, connectionCopy, chatCopy } from './panels/copy';
 
 function Blob({ color, size = 30 }: { color: string; size?: number }) {
   return (
@@ -16,7 +17,20 @@ export default function LeftPanel({ room = 'jfwq6' }: { room?: string }) {
   const { state, dispatch } = useGame();
   const [draft, setDraft] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showAdblockModal, setShowAdblockModal] = useState(true);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const url = `https://rajniti.io/room/${room}`;
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const copy = async () => {
     try {
@@ -44,8 +58,15 @@ export default function LeftPanel({ room = 'jfwq6' }: { room?: string }) {
         </div>
       </div>
 
+      {isOffline && (
+        <div className="bg-[#e05e3a] text-white p-3 rounded-lg text-sm text-center">
+          <div className="font-bold">{connectionCopy.bannerTitle}</div>
+          <div className="text-xs mt-1">{connectionCopy.bannerBody}</div>
+        </div>
+      )}
+
       <div className="bg-panel border border-edge rounded-xl p-3.5">
-        <p className="text-center text-lav font-bold text-sm mb-2.5">Share this game ⓘ</p>
+        <p className="text-center text-lav font-bold text-sm mb-2.5">{shareCopy.header} ⓘ</p>
         <div className="flex gap-2">
           <div className="flex-1 bg-ink border border-edge rounded-lg px-3 py-2 text-xs overflow-hidden whitespace-nowrap text-ellipsis">
             {url}
@@ -54,29 +75,29 @@ export default function LeftPanel({ room = 'jfwq6' }: { room?: string }) {
             onClick={copy}
             className="bg-tile border border-line rounded-lg px-3.5 py-2 text-[13px] font-semibold min-h-[44px]"
           >
-            {copied ? '✓ Copied' : '⧉ Copy'}
+            {copied ? shareCopy.copiedBtn : shareCopy.copyBtn}
           </button>
         </div>
         <button
           onClick={() => dispatch({ type: 'BACK_TO_LOBBY' })}
           className="w-full mt-2 bg-tile border border-line rounded-lg px-3 py-2 text-[13px] font-semibold min-h-[44px]"
         >
-          ⚙ View room settings
+          {shareCopy.viewSettings}
         </button>
       </div>
 
       <div className="border border-dashed border-line rounded-[10px] p-2 text-center text-xs text-fog">
-        Disable your ad blocker to support Rajniti.io
+        {adblockCopy.inline}
       </div>
 
       <div className="bg-panel border border-edge rounded-xl flex-1 flex flex-col min-h-0 overflow-hidden">
         <div className="flex items-center justify-center gap-2 p-2.5 border-b border-edge">
           <span className="text-fog text-[13px]">🔊 ✣</span>
-          <b className="text-lav text-sm">Chat</b>
+          <b className="text-lav text-sm">{chatCopy.header}</b>
         </div>
         <div className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-2.5">
           {state.chat.length === 0 && (
-            <p className="text-center text-fog text-[13px] mt-6">💬 No messages yet</p>
+            <p className="text-center text-fog text-[13px] mt-6">💬 {chatCopy.empty}</p>
           )}
           {state.chat.map((m) => (
             <div key={m.id} className="flex gap-2 items-start">
@@ -92,7 +113,7 @@ export default function LeftPanel({ room = 'jfwq6' }: { room?: string }) {
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Say something..."
+            placeholder={chatCopy.placeholder}
             className="flex-1 bg-ink border border-edge rounded-full px-4 py-2.5 text-[13px] outline-none placeholder:text-fog min-h-[44px]"
           />
           <button
@@ -104,6 +125,23 @@ export default function LeftPanel({ room = 'jfwq6' }: { room?: string }) {
           </button>
         </form>
       </div>
+
+      {showAdblockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-panel border border-edge rounded-xl p-5 max-w-sm w-full relative">
+            <button
+              onClick={() => setShowAdblockModal(false)}
+              className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center text-fog bg-tile rounded-full text-xs"
+            >
+              ✕
+            </button>
+            <h3 className="text-lav font-bold text-lg mb-3">{adblockCopy.modalTitle}</h3>
+            <p className="text-sm text-fog leading-relaxed mb-4">
+              {adblockCopy.modalBody}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
