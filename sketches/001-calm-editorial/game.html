@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game K7X9MP — Monopoly</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; color: #1a1a2e; background: #fafafa; line-height: 1.5; }
+    .btn-primary { @apply px-4 py-2 rounded-xl bg-[#1a1a2e] text-white font-medium text-sm transition-all hover:bg-[#0f0f1e] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e] focus:ring-offset-2; }
+    .btn-secondary { @apply px-4 py-2 rounded-xl border-2 border-[#1a1a2e] text-[#1a1a2e] font-medium text-sm transition-all hover:bg-[#1a1a2e] hover:text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e] focus:ring-offset-2; }
+    .btn-ghost { @apply px-3 py-1.5 rounded-lg text-[#666] font-medium text-sm hover:bg-[#e8e8e8] hover:text-[#1a1a2e] transition-colors; }
+    .card { @apply bg-white rounded-2xl shadow-sm border border-[#e8e8e8] p-4; }
+    .token { @apply w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2; }
+    .token-you { @apply border-[#0066cc] bg-[#0066cc]/20 text-[#0066cc]; }
+    .cash { @apply font-mono text-lg font-semibold; }
+    .property { @apply px-2 py-1 rounded text-xs font-medium whitespace-nowrap; }
+    .property-rent { @apply bg-[#10b981]/10 text-[#10b981] border border-[10b981]/20; }
+    .property-owned { @apply bg-[#0066cc]/10 text-[#0066cc] border border-[0066cc]/20; }
+    .property-mortgaged { @apply bg-[#6b7280]/10 text-[#6b7280] border border-[6b7280]/20; }
+    .house { @apply inline-block w-2 h-2 bg-[#10b981] rounded mt-[-1px] mb-[-1px]; }
+    .hotel { @apply inline-block w-4 h-2 bg-[#0066cc] rounded mt-[-1px] mb-[-1px]; }
+    .chat-input { @apply flex-1 px-3 py-2 text-sm border border-[#e8e8e8] rounded-xl outline-none focus:border-[#0066cc]; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Top Bar -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#e8e8e8]">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button class="btn-ghost" id="leaveBtn">← Leave Game</button>
+        <div>
+          <p class="text-xs text-[#999] uppercase tracking-wide">Room Code</p>
+          <p class="text-xl font-mono font-bold text-[#1a1a2e] tracking-widest" id="roomCode">K7X9MP</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-[#666]">
+        <div class="flex items-center gap-1">
+          <div class="w-2 h-2 bg-[#10b981] rounded mr-1"></div>
+          <span>3 houses</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="w-4 h-2 bg-[#0066cc] rounded mr-1"></div>
+          <span>1 hotel</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-20 px-4 pb-16">
+    <div class="max-w-5xl mx-auto grid lg:grid-cols-3 gap-6">
+      
+      <!-- Left: Board -->
+      <section class="lg:col-span-2" aria-label="Game Board">
+        <div class="card">
+          <div class="relative aspect-square" id="boardContainer">
+            <!-- SVG board will be injected by JS -->
+          </div>
+          <div class="mt-4 flex flex-col items-center gap-2">
+            <button class="btn-primary" id="rollBtn">Roll Dice</button>
+            <div class="flex gap-2" id="diceDisplay">
+              <!-- Dice rendered by JS -->
+            </div>
+            <p class="text-xs text-[#999]" id="turnInfo">Your turn</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Player Info & Controls -->
+      <section class="lg:col-span-1 space-y-6" aria-label="Player Info">
+        <!-- Player List -->
+        <div class="card">
+          <h2 class="text-lg font-semibold text-[#1a1a2e] mb-4">Players</h2>
+          <div class="space-y-3" id="playerInfo">
+            <!-- Player cards rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Your Properties -->
+        <div class="card">
+          <h2 class="text-lg font-semibold text-[#1a1a2e] mb-4">Your Properties</h2>
+          <div class="space-y-2" id="myProperties">
+            <!-- Properties rendered by JS -->
+          </div>
+          <p class="text-xs text-[#999] mt-3 text-center" id="myCash">Cash: $1,500</p>
+        </div>
+
+        <!-- Game Controls -->
+        <div class="card">
+          <h2 class="text-lg font-semibold text-[#1a1a2e] mb-4">Controls</h2>
+          <div class="space-y-3" id="controls">
+            <button class="btn-secondary w-full" id="mortgageBtn">Mortgage Property</button>
+            <button class="btn-secondary w-full" id="buildBtn">Build House/Hotel</button>
+            <button class="btn-secondary w-full" id="tradeBtn">Trade</Button>
+            <button class="btn-secondary w-full" id="bankruptcyBtn">Declare Bankruptcy</button>
+            <button class="btn-secondary w-full" id="settingsBtn">Game Settings</button>
+          </div>
+        </div>
+
+        <!-- Chat -->
+        <div class="card">
+          <h2 class="text-lg font-semibold text-[#1a1a2e] mb-4">Chat</h2>
+          <div class="h-40 overflow-y-auto space-y-2 border-t border-[#e8e8e8] pt-3" id="chatMessages">
+            <!-- Chat messages rendered by JS -->
+          </div>
+          <form class="mt-3 flex gap-2" id="chatForm">
+            <input type="text" placeholder="Type a message..." class="chat-input" id="chatInput">
+            <button type="submit" class="btn-primary px-4">Send</button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Actions -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[#e8e8e8] px-4 py-3 hidden md:block">
+    <div class="flex justify-center gap-3">
+      <button class="btn-secondary px-6" id="mobileRoll">Roll</button>
+      <button class="btn-primary px-6" id="mobileBuild">Build</button>
+      <button class="btn-secondary px-6" id="mobileTrade">Trade</button>
+    </div>
+  </footer>
+
+  <script>
+    // --- Mock Data ---
+    const players = [
+      { id: 'me', name: 'You', token: '🎩', color: '#2563eb', cash: 1500, position: 0, isYou: true },
+      { id: 'p2', name: 'Sarah', token: '🚗', color: '#16a34a', cash: 1200, position: 5, isYou: false },
+      { id: 'p3', name: 'Bot-Alice', token: '🐕', color: '#dc2626', cash: 800, position: 12, isYou: false, isBot: true },
+    ];
+    const myId = 'me';
+    const properties = [
+      { id: 0, name: 'GO', color: '#10b981', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 1, name: 'Mediterranean Ave', color: '#3b82f6', ownedBy: 'me', mortgage: false, houses: 0, hotel: 0 },
+      { id: 2, name: 'Community Chest', color: '#6b7280', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 3, name: 'Baltic Ave', color: '#3b82f6', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 4, name: 'Income Tax', color: '#ef4444', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 5, name: 'Reading Railroad', color: '#f59e0b', ownedBy: 'p2', mortgage: false, houses: 0, hotel: 0 },
+      { id: 6, name: 'Oriental Ave', color: '#8b5cf6', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 7, name: 'Chance', color: '#6b7280', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 8, name: 'Vermont Ave', color: '#8b5cf6', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 9, name: 'Connecticut Ave', color: '#8b5cf6', ownedBy: 'me', mortgage: false, houses: 1, hotel: 0 },
+      { id: 10, name: 'Jail / Just Visiting', color: '#6b7280', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      // ... rest simplified
+    ];
+
+    // --- Render Functions ---
+    function renderBoard() {
+      const container = document.getElementById('boardContainer');
+      const size = 500;
+      const cell = size / 11;
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("width", size);
+      svg.setAttribute("height", size);
+      svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+      svg.className = "w-full h-full";
+
+      // Outer border
+      const outer = document.createElementNS(svgNS, "rect");
+      outer.setAttribute("x", 0);
+      outer.setAttribute("y", 0);
+      outer.setAttribute("width", size);
+      outer.setAttribute("height", size);
+      outer.setAttribute("fill", "none");
+      outer.setAttribute("stroke", "#e8e8e8");
+      outer.setAttribute("stroke-width", 2);
+      svg.appendChild(outer);
+
+      // Inner area
+      const inner = document.createElementNS(svgNS, "rect");
+      inner.setAttribute("x", cell);
+      inner.setAttribute("y", cell);
+      inner.setAttribute("width", size - 2*cell);
+      inner.setAttribute("height", size - 2*cell);
+      inner.setAttribute("fill", "#fafafa");
+      svg.appendChild(inner);
+
+      // Draw properties (simplified: just labels on sides)
+      const sideLength = 9; // properties per side excluding corners
+      const positions = [
+        // Bottom: GO (0) to Connecticut (9) - actually 0-10? We'll do 0-9 bottom, 10-19 left, etc.
+        // We'll just place labels for a few key positions for sketch.
+      ];
+      // For sketch, we'll just show a few property tokens on the board as circles.
+      properties.forEach((prop, index) => {
+        if (prop.ownedBy === null) return;
+        const player = players.find(p => p.id === prop.ownedBy);
+        if (!player) return;
+        // Position mapping (simplified)
+        let angle, radius;
+        if (index < 11) { // bottom side
+          angle = Math.PI * 1.5;
+          radius = size/2 - cell;
+          const x = size/2 + Math.cos(angle) * radius * ((index) / 10);
+          const y = size/2 + Math.sin(angle) * radius;
+          // Actually we want to spread along bottom edge
+          const progress = index / 10; // 0 to 1
+          const xPos = cell + (size - 2*cell) * progress;
+          const yPos = size - cell;
+          // Draw token
+          const circle = document.createElementNS(svgNS, "circle");
+          circle.setAttribute("cx", xPos);
+          circle.setAttribute("cy", yPos);
+          circle.setAttribute("r", 12);
+          circle.setAttribute("fill", player.color);
+          circle.setAttribute("opacity", 0.8);
+          svg.appendChild(circle);
+          // Houses/hotels
+          if (prop.houses > 0) {
+            for (let h = 0; h < Math.min(prop.houses, 4); h++) {
+              const house = document.createElementNS(svgNS, "rect");
+              house.setAttribute("x", xPos - 6 + h*3);
+              house.setAttribute("y", yPos - 18);
+              house.setAttribute("width", 2);
+              house.setAttribute("height", 4);
+              house.setAttribute("fill", "#10b981");
+              svg.appendChild(house);
+            }
+          }
+          if (prop.hotel > 0) {
+            const hotel = document.createElementNS(svgNS, "rect");
+            hotel.setAttribute("x", xPos - 6);
+            hotel.setAttribute("y", yPos - 18);
+            hotel.setAttribute("width", 12);
+            hotel.setAttribute("height", 4);
+            hotel.setAttribute("fill", "#0066cc");
+            svg.appendChild(hotel);
+          }
+        }
+      });
+
+      container.innerHTML = '';
+      container.appendChild(svg);
+    }
+
+    function renderPlayerInfo() {
+      const container = document.getElementById('playerInfo');
+      container.innerHTML = players.map(p => {
+        const isYou = p.id === myId;
+        return `
+          <div class="flex items-center gap-3 p-3 rounded-xl ${isYou ? 'bg-[#0066cc]/5' : 'hover:bg-[#fafafa]'}" data-id="${p.id}">
+            <div class="token ${isYou ? 'token-you' : ''}" style="background:${p.color};">
+              ${p.token}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-[#1a1a2e] truncate">${p.name}${p.isYou ? ' <span class="text-xs text-[#0066cc] ml-1">(You)</span>' : ''}${p.isBot ? ' <span class="text-xs text-[#999] ml-1">(Bot)</span>' : ''}</p>
+              <p class="text-xs text-[#999] flex items-center gap-1">
+                <span class="cash">$${p.cash.toLocaleString()}</span>
+                <span class="token" style="background:${p.color};">${p.token}</span>
+              </p>
+            </div>
+            <div class="text-xs text-[#999]">
+              Space ${p.position}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMyProperties() {
+      const container = document.getElementById('myProperties');
+      const myProps = properties.filter(p => p.ownedBy === myId);
+      if (myProps.length === 0) {
+        container.innerHTML = '<p class="text-xs text-[#999] text-center py-4">No properties yet</p>';
+        return;
+      }
+      container.innerHTML = myProps.map(p => {
+        const houses = '🟩'.repeat(Math.min(p.houses, 4));
+        const hotel = p.hotel > 0 ? '🏨' : '';
+        return `
+          <div class="flex items-start gap-3 p-2 rounded border border-[#e8e8e8]">
+            <div class="flex-shrink-0">
+              <span class="text-2xl">${p.id === 0 ? '⚪' : '🟦'}</span>
+            </div>
+            <div class="flex-1 min-w-0 space-y-0.5">
+              <p class="font-medium text-[#1a1a2e] truncate">${p.name}</p>
+              <p class="text-xs text-[#666] flex items-center gap-1">
+                ${houses}${hotel}
+                ${p.mortgage ? ' <span class="text-xs text-[#999] italic">(Mortgaged)</span>' : ''}
+              </p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderChat() {
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = `
+        <div class="flex gap-2">
+          <span class="text-xs text-[#0066cc] w-20 shrink-0 font-medium">You</span>
+          <span class="text-sm text-[#1a1a2e]">Anyone want to trade for Connecticut Ave?</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-xs text-[#999] w-20 shrink-0">System</span>
+          <span class="text-sm text-[#1a1a2e]">Sarah landed on Income Tax and paid $200</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-xs text-[#0066cc] w-20 shrink-0 font-medium">Sarah</span>
+          <span class="text-sm text-[#1a1a2e]">No thanks, I'm saving for houses</span>
+        </div>
+      `;
+    }
+
+    function renderDice() {
+      const container = document.getElementById('diceDisplay');
+      container.innerHTML = `
+        <div class="w-8 h-8 rounded border border-[#e8e8e8] flex items-center justify-center text-2xl">⚀</div>
+        <div class="w-8 h-8 rounded border border-[#e8e8e8] flex items-center justify-center text-2xl">⚀</div>
+      `;
+    }
+
+    function renderControls() {
+      // Already in HTML, just enable/disable based on game state
+    }
+
+    // --- Event Handlers ---
+    function init() {
+      renderBoard();
+      renderPlayerInfo();
+      renderMyProperties();
+      renderChat();
+      renderDice();
+
+      document.getElementById('rollBtn').addEventListener('click', () => {
+        document.getElementById('rollBtn').disabled = true;
+        document.getElementById('rollBtn').textContent = 'Rolling...';
+        setTimeout(() => {
+          document.getElementById('rollBtn').disabled = false;
+          document.getElementById('rollBtn').textContent = 'Roll Dice';
+          // Update dice display randomly
+          const dice1 = Math.floor(Math.random()*6)+1;
+          const dice2 = Math.floor(Math.random()*6)+1;
+          const diceEls = document.getElementById('diceDisplay').children;
+          diceEls[0].textContent = '⚀'.repeat(dice1).replace(/./g, (c,i) => ['⚀','⚁','⚂','⚃','⚄','⚅'][dice1-1]);
+          diceEls[1].textContent = '⚀'.repeat(dice2).replace(/./g, (c,i) => ['⚀','⚁','⚂','⚃','⚄','⚅'][dice2-1]);
+          // Move player (mock)
+          const me = players.find(p => p.id === myId);
+          me.position = (me.position + dice1 + dice2) % 40;
+          renderPlayerInfo();
+          renderMyProperties(); // might change owned properties
+          document.getElementById('turnInfo').textContent = 'Waiting for others...';
+        }, 1000);
+      });
+
+      document.getElementById('buildBtn').addEventListener('click', () => {
+        alert('Build menu would open');
+      });
+
+      document.getElementById('tradeBtn').addEventListener('click', () => {
+        alert('Trade menu would open');
+      });
+
+      document.getElementById('mortgageBtn').addEventListener('click', () => {
+        alert('Mortgage menu would open');
+      });
+
+      document.getElementById('bankruptcyBtn').addEventListener('click', () => {
+        if (confirm('Declare bankruptcy? This will end your game.')) {
+          alert('Game over');
+        }
+      });
+
+      document.getElementById('settingsBtn').addEventListener('click', () => {
+        alert('Game settings modal');
+      });
+
+      document.getElementById('leaveBtn').addEventListener('click', () => {
+        if (confirm('Leave game? You will be replaced by AI.')) {
+          alert('Would redirect to lobby');
+        }
+      });
+
+      // Chat
+      document.getElementById('chatForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const input = document.getElementById('chatInput');
+        if (!input.value.trim()) return;
+        const msg = document.createElement('div');
+        msg.className = 'flex gap-2';
+        msg.innerHTML = `<span class="text-xs text-[#0066cc] w-20 shrink-0 font-medium">You</span><span class="text-sm text-[#1a1a2e]">${input.value}</span>`;
+        document.getElementById('chatMessages').appendChild(msg);
+        input.value = '';
+        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+      });
+
+      // Mobile buttons
+      document.getElementById('mobileRoll').addEventListener('click', () => document.getElementById('rollBtn').click());
+      document.getElementById('mobileBuild').addEventListener('click', () => document.getElementById('buildBtn').click());
+      document.getElementById('mobileTrade').addEventListener('click', () => document.getElementById('tradeBtn').click());
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monopoly — Play the Classic, Reimagined</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; color: #1a1a2e; background: #fafafa; line-height: 1.6; }
+    .bg-pattern { background-image: radial-gradient(#e0e0e0 1px, transparent 1px); background-size: 40px 40px; }
+    .btn-primary { @apply px-8 py-3 rounded-xl bg-[#1a1a2e] text-white font-medium transition-all hover:bg-[#0f0f1e] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e] focus:ring-offset-2; }
+    .btn-secondary { @apply px-8 py-3 rounded-xl border-2 border-[#1a1a2e] text-[#1a1a2e] font-medium transition-all hover:bg-[#1a1a2e] hover:text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e] focus:ring-offset-2; }
+    .card { @apply bg-white rounded-2xl shadow-sm border border-[#e8e8e8] p-6 transition-shadow hover:shadow-md; }
+  </style>
+</head>
+<body class="min-h-screen bg-pattern">
+  <!-- Nav -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#e8e8e8]">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="#" class="text-2xl font-bold text-[#1a1a2e] tracking-tight">MONOPOLY</a>
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#features" class="text-sm font-medium text-[#666] hover:text-[#1a1a2e] transition-colors">Features</a>
+        <a href="#how-it-works" class="text-sm font-medium text-[#666] hover:text-[#1a1a2e] transition-colors">How It Works</a>
+        <a href="#faq" class="text-sm font-medium text-[#666] hover:text-[#1a1a2e] transition-colors">FAQ</a>
+      </div>
+      <button class="btn-primary text-sm" id="playBtn">Play Now</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="pt-32 pb-20 px-6">
+    <div class="max-w-7xl mx-auto text-center">
+      <p class="text-sm font-medium text-[#0066cc] mb-4 tracking-wide uppercase">Now in Open Beta</p>
+      <h1 class="text-5xl md:text-7xl font-bold text-[#1a1a2e] leading-tight tracking-tight mb-6">
+        The Classic Board Game,<br><span class="text-[#0066cc]">Reimagined for Online Play</span>
+      </h1>
+      <p class="text-lg md:text-xl text-[#666] max-w-2xl mx-auto mb-10 leading-relaxed">
+        No ads. No pay-to-win. Just pure Monopoly — real-time multiplayer, custom house rules, 
+        and cross-platform play between web and mobile.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <button class="btn-primary text-lg px-10 py-4" id="heroPlayBtn">Create Free Game</button>
+        <button class="btn-secondary text-lg px-10 py-4" id="heroWatchBtn">Watch a Game</button>
+      </div>
+      <p class="text-sm text-[#999]">No account required • Games save automatically • Works offline</p>
+    </div>
+  </header>
+
+  <!-- Stats Bar -->
+  <section class="px-6 py-12 border-y border-[#e8e8e8] bg-white">
+    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div>
+        <p class="text-3xl md:text-4xl font-bold text-[#1a1a2e]" id="statGames">12,340</p>
+        <p class="text-sm text-[#666] mt-1">Games Played</p>
+      </div>
+      <div>
+        <p class="text-3xl md:text-4xl font-bold text-[#1a1a2e]" id="statPlayers">3,210</p>
+        <p class="text-sm text-[#666] mt-1">Active Players</p>
+      </div>
+      <div>
+        <p class="text-3xl md:text-4xl font-bold text-[#1a1a2e]" id="statAvgTime">42m</p>
+        <p class="text-sm text-[#666] mt-1">Avg Game Time</p>
+      </div>
+      <div>
+        <p class="text-3xl md:text-4xl font-bold text-[#1a1a2e]" id="statRating">4.8★</p>
+        <p class="text-sm text-[#666] mt-1">App Store Rating</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="px-6 py-20">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-[#1a1a2e] mb-4">Built for How You Actually Play</h2>
+        <p class="text-lg text-[#666] max-w-2xl mx-auto">Every feature exists because players asked for it.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        <article class="card group">
+          <div class="w-12 h-12 rounded-xl bg-[#0066cc]/10 flex items-center justify-center mb-4 group-hover:bg-[#0066cc] group-hover:text-white transition-colors">
+            <svg class="w-6 h-6 text-[#0066cc] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-[#1a1a2e] mb-2">Real-Time Multiplayer</h3>
+          <p class="text-[#666]">Socket.io powered — sub-100ms latency. Reconnect seamlessly if your connection drops. Spectate friends' games live.</p>
+        </article>
+        <article class="card group">
+          <div class="w-12 h-12 rounded-xl bg-[#0066cc]/10 flex items-center justify-center mb-4 group-hover:bg-[#0066cc] group-hover:text-white transition-colors">
+            <svg class="w-6 h-6 text-[#0066cc] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-[#1a1a2e] mb-2">Custom House Rules</h3>
+          <p class="text-[#666]">Free Parking jackpot, auction toggles, double rent on GO, no-auction buys — toggle 15+ rule variants per game.</p>
+        </article>
+        <article class="card group">
+          <div class="w-12 h-12 rounded-xl bg-[#0066cc]/10 flex items-center justify-center mb-4 group-hover:bg-[#0066cc] group-hover:text-white transition-colors">
+            <svg class="w-6 h-6 text-[#0066cc] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-[#1a1a2e] mb-2">Cross-Platform</h3>
+          <p class="text-[#666]">Play on web, iOS, or Android. Same account, same games. Capacitor-native apps with haptics and background audio.</p>
+        </article>
+        <article class="card group">
+          <div class="w-12 h-12 rounded-xl bg-[#0066cc]/10 flex items-center justify-center mb-4 group-hover:bg-[#0066cc] group-hover:text-white transition-colors">
+            <svg class="w-6 h-6 text-[#0066cc] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-[#1a1a2e] mb-2">Full Game Replays</h3>
+          <p class="text-[#666]">Every move recorded. Watch back at 2x, 5x, or step through turn-by-turn. Share replay links that never expire.</p>
+        </article>
+        <article class="card group">
+          <div class="w-12 h-12 rounded-xl bg-[#0066cc]/10 flex items-center justify-center mb-4 group-hover:bg-[#0066cc] group-hover:text-white transition-colors">
+            <svg class="w-6 h-6 text-[#0066cc] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-[#1a1a2e] mb-2">Smart AI Opponents</h3>
+          <p class="text-[#666]">Fill empty seats with bots that actually trade, build strategically, and manage cash flow. Three difficulty tiers.</p>
+        </article>
+        <article class="card group">
+          <div class="w-12 h-12 rounded-xl bg-[#0066cc]/10 flex items-center justify-center mb-4 group-hover:bg-[#0066cc] group-hover:text-white transition-colors">
+            <svg class="w-6 h-6 text-[#0066cc] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+          </div>
+          <h3 class="text-xl font-semibold text-[#1a1a2e] mb-2">Tournaments & Leagues</h3>
+          <p class="text-[#666]">Weekly ranked seasons, private leagues for friends, ELO tracking, and seasonal cosmetics for your token.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="px-6 py-20 bg-white border-y border-[#e8e8e8]">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-[#1a1a2e] mb-4">Start a Game in 30 Seconds</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="relative text-center">
+          <div class="w-16 h-16 rounded-2xl bg-[#1a1a2e] text-white flex items-center justify-center text-2xl font-bold mx-auto mb-6">1</div>
+          <h3 class="text-xl font-semibold text-[#1a1a2e] mb-2">Create or Join</h3>
+          <p class="text-[#666]">Click "Create Game", pick your rules, share the 6-character code. Or enter a friend's code to join instantly.</p>
+        </div>
+        <div class="relative text-center">
+          <div class="w-16 h-16 rounded-2xl bg-[#1a1a2e] text-white flex items-center justify-center text-2xl font-bold mx-auto mb-6">2</div>
+          <h3 class="text-xl font-semibold text-[#1a1a2e] mb-2">Pick Your Token</h3>
+          <p class="text-[#666]">Classic tokens (top hat, car, dog) plus seasonal unlockables. Choose your color — first come, first served.</p>
+        </div>
+        <div class="relative text-center">
+          <div class="w-16 h-16 rounded-2xl bg-[#1a1a2e] text-white flex items-center justify-center text-2xl font-bold mx-auto mb-6">3</div>
+          <h3 class="text-xl font-semibold text-[#1a1a2e] mb-2">Roll & Play</h3>
+          <p class="text-[#666]">Tap to roll. Drag to trade. Tap properties to build. All touch-optimized. Game state syncs instantly across devices.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="px-6 py-20">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-[#1a1a2e] mb-4">Ready to Play?</h2>
+      <p class="text-lg text-[#666] mb-8">Your first game is one click away. No download, no signup, no nonsense.</p>
+      <button class="btn-primary text-lg px-10 py-4" id="ctaPlayBtn">Start Free Game</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="px-6 py-12 border-t border-[#e8e8e8] bg-white">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <p class="text-sm text-[#999]">© 2025 Monopoly Reimagined. Not affiliated with Hasbro.</p>
+      <div class="flex items-center gap-6">
+        <a href="#" class="text-sm text-[#666] hover:text-[#1a1a2e]">Privacy</a>
+        <a href="#" class="text-sm text-[#666] hover:text-[#1a1a2e]">Terms</a>
+        <a href="#" class="text-sm text-[#666] hover:text-[#1a1a2e]">GitHub</a>
+        <a href="#" class="text-sm text-[#666] hover:text-[#1a1a2e]">Discord</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Simple counter animation
+    const stats = [
+      { el: document.getElementById('statGames'), target: 12340, suffix: '' },
+      { el: document.getElementById('statPlayers'), target: 3210, suffix: '' },
+      { el: document.getElementById('statAvgTime'), target: 42, suffix: 'm' },
+      { el: document.getElementById('statRating'), target: 4.8, suffix: '★' }
+    ];
+    
+    function animateCount(stat) {
+      const duration = 1500;
+      const start = 0;
+      const startTime = performance.now();
+      
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = stat.target * eased;
+        
+        if (stat.target % 1 === 0) {
+          stat.el.textContent = Math.floor(current).toLocaleString() + stat.suffix;
+        } else {
+          stat.el.textContent = current.toFixed(1) + stat.suffix;
+        }
+        
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          stats.forEach(animateCount);
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    observer.observe(document.querySelector('#features'));
+    
+    // Button interactions
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        btn.style.transform = 'scale(0.96)';
+        setTimeout(() => btn.style.transform = '', 150);
+        if (btn.textContent.includes('Play') || btn.textContent.includes('Start')) {
+          alert('Would navigate to /room/new — hook up router in real app');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

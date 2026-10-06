@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monopoly Online — Play Now!</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Press Start 2E', system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #fff; background: linear-gradient(135deg, #1a1a2e, #16213e); line-height: 1.5; }
+    .btn-primary { @apply px-6 py-3 rounded-2xl bg-gradient-to-r from-[#ff9a56] to-[#ff6a88] text-white font-bold text-lg transition-all hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#ff9a56] focus:ring-offset-2; }
+    .btn-secondary { @apply px-6 py-3 rounded-2xl border-2 border-[#ff9a56] text-[#ff9a56] font-bold text-lg transition-all hover:bg-[#ff9a56] hover:text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#ff9a56] focus:ring-offset-2; }
+    .btn-ghost { @apply px-4 py-2 rounded-xl text-[#ff9a56] font-bold text-base hover:bg-[#ff9a56]/10 hover:text-white transition-all; }
+    .card { @apply bg-gradient-to-br from-[#16213e]/80 to-[#0f172a]/80 rounded-3xl border border-[#ff9a56]/20 p-6 backdrop-blur-sm; }
+    .token { @apply inline-flex h-12 w-12 items-center justify-center rounded-full text-2xl font-bold border-4 border-white; }
+    .cash { @apply font-mono text-2xl font-bold text-[#4cc9f0]; }
+    .stat { @apply text-center; }
+    .stat-value { @apply block text-3xl font-bold text-[#4cc9f0]; }
+    .stat-label { @apply block text-sm text-[#ff9a56] mt-2; }
+    .logo { @apply text-4xl font-bold text-gradient to-r from-[#ff9a56] to-[#ff6a88] bg-clip-text text-transparent; }
+  </style>
+</head>
+<body class="min-h-screen relative overflow-hidden">
+  <!-- Animated Background -->
+  <div class="absolute inset-0">
+    <canvas id="bgCanvas"></canvas>
+  </div>
+  
+  <!-- Content -->
+  <div class="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 pb-20">
+    
+    <!-- Header -->
+    <header class="mb-16 text-center">
+      <h1 class="logo mb-4">MONOPOLY</h1>
+      <p class="text-lg text-[#ff9a56] mb-6 tracking-wider">Online Multiplayer Edition</p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <button class="btn-primary" id="playBtn">PLAY NOW</button>
+        <button class="btn-secondary" id="tourBtn">HOW TO PLAY</button>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <section class="grid md:grid-cols-3 gap-6 mb-16 w-full max-w-4xl">
+      <div class="stat card">
+        <p class="stat-value" id="gamesPlayed">12,340</p>
+        <p class="stat-label">Games Played</p>
+      </div>
+      <div class="stat card">
+        <p class="stat-value" id="activePlayers">3,210</p>
+        <p class="stat-label">Online Now</p>
+      </div>
+      <div class="stat card">
+        <p class="stat-value" id="avgGameTime">42m</p>
+        <p class="stat-label">Avg Game Time</p>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="grid md:grid-cols-2 gap-8 mb-16 w-full max-w-5xl">
+      <div class="card flex items-start gap-4">
+        <div class="w-14 h-14 bg-gradient-to-r from-[#ff9a56] to-[#ff6a88] rounded-2xl flex items-center justify-center text-2xl text-white mb-2">🎲</div>
+        <div>
+          <h2 class="text-xl font-bold text-[#ff9a56] mb-2">Real-Time Multiplayer</h2>
+          <p class="text-[#fff]/80">Play with friends or strangers worldwide. Socket.io powered with <100ms latency.</p>
+        </div>
+      </div>
+      <div class="card flex items-start gap-4">
+        <div class="w-14 h-14 bg-gradient-to-r from-[#ff9a56] to-[#ff6a88] rounded-2xl flex items-center justify-center text-2xl text-white mb-2">📋</div>
+        <div>
+          <h2 class="text-xl font-bold text-[#ff9a56] mb-2">Custom House Rules</h2>
+          <p class="text-[#fff]/80">Toggle 15+ rule variations: Free Parking jackpot, auction rules, double rent on GO, and more.</p>
+        </div>
+      </div>
+      <div class="card flex items-start gap-4">
+        <div class="w-14 h-14 bg-gradient-to-r from-[#ff9a56] to-[#ff6a88] rounded-2xl flex items-center justify-center text-2xl text-white mb-2">📱</div>
+        <div>
+          <h2 class="text-xl font-bold text-[#ff9a56] mb-2">Cross-Platform</h2>
+          <p class="text-[#fff]/80">Play on web, iOS, or Android. Sync your progress and play anywhere.</p>
+        </div>
+      </div>
+      <div class="card flex items-start gap-4">
+        <div class="w-14 h-14 bg-gradient-to-r from-[#ff9a56] to-[#ff6a88] rounded-2xl flex items-center justify-center text-2xl text-white mb-2">🏆</div>
+        <div>
+          <h2 class="text-xl font-bold text-[#ff9a56] mb-2">Tournaments & Leagues</h2>
+          <p class="text-[#fff]/80">Compete in weekly seasons, climb leaderboards, and earn exclusive tokens and boards.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="text-center mb-16">
+      <h2 class="text-2xl font-bold text-[#ff9a56] mb-4">Ready to Roll?</h2>
+      <p class="text-lg text-[#fff]/80 max-w-2xl mx-auto mb-6">
+        Your first game is free. No accounts, no ads, no pay-to-win. Just pure Monopoly fun.
+      </p>
+      <button class="btn-primary text-xl px-8 py-4" id="ctaPlay">START FREE GAME</button>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-[#fff]/60 text-sm">
+      <p>© 2025 Monopoly Online. Not affiliated with Hasbro.</p>
+      <div class="mt-4 flex flex-col sm:flex-row justify-center gap-4">
+        <a href="#" class="hover:text-[#ff9a56]">Privacy</a>
+        <a href="#" class="hover:text-[#ff9a56]">Terms</a>
+        <a href="#" class="hover:text-[#ff9a56]">GitHub</a>
+        <a href="#" class="hover:text-[#ff9a56]">Discord</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Canvas background animation
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() {
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Dice animation
+    const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    const dice = [];
+    for (let i = 0; i < 50; i++) {
+      dice.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 4,
+        vy: (Math.random() - 0.5) * 4,
+        size: 20 + Math.random() * 30,
+        face: diceFaces[Math.floor(Math.random() * 6)],
+        color: `hsl(${Math.random() * 60 + 20}, 80%, 60%)`,
+        rotation: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.2
+      });
+    }
+
+    function animateBackground() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      dice.forEach(d => {
+        // Update position
+        d.x += d.vx;
+        d.y += d.vy;
+        d.rotation += d.spin;
+
+        // Bounce off walls
+        if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
+        if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+
+        // Draw dice
+        ctx.save();
+        ctx.translate(d.x, d.y);
+        ctx.rotate(d.rotation);
+        ctx.beginPath();
+        ctx.roundRect(-d.size/2, -d.size/2, d.size, d.size, 4);
+        ctx.fillStyle = d.color;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `${d.size * 0.4}px 'Press Start 2E'`;
+        ctx.fillStyle = '#fff';
+        ctx.fillText(d.face, 0, 0);
+        ctx.restore();
+      });
+      requestAnimationFrame(animateBackground);
+    }
+    animateBackground();
+
+    // Button interactions
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        btn.style.transform = 'scale(0.95)';
+        setTimeout(() => btn.style.transform = '', 100);
+        if (btn.id === 'playBtn' || btn.id === 'ctaPlay') {
+          alert('Would navigate to /room/new');
+        } else if (btn.id === 'tourBtn') {
+          alert('Would show gameplay tutorial modal');
+        }
+      });
+    });
+
+    // Counter animation
+    const stats = [
+      { el: document.getElementById('gamesPlayed'), target: 12340 },
+      { el: document.getElementById('activePlayers'), target: 3210 },
+      { el: document.getElementById('avgGameTime'), target: 42 }
+    ];
+    
+    function animateCount(stat) {
+      const duration = 2000;
+      const startTime = performance.now();
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        let current;
+        if (Number.isInteger(stat.target)) {
+          current = Math.floor(stat.target * eased);
+          stat.el.textContent = current.toLocaleString();
+        } else {
+          current = stat.target * eased;
+          stat.el.textContent = current.toFixed(1) + 'm';
+        }
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          stats.forEach(animateCount);
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    observer.observe(document.querySelector('section:nth-child(3)'));
+  </script>
+</body>
+</html>

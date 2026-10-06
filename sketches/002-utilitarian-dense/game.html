@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game ABC123 — Monopoly</title>
+  <script src="https://cdn.tailwindcss.com"></font>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #111; background: #f9fafb; line-height: 1.5; }
+    .btn-primary { @apply px-4 py-2 rounded bg-[#111] text-white font-medium text-sm transition-colors hover:bg-[#000] focus:outline-none focus:ring-2 focus:ring-[#111] focus:ring-offset-2; }
+    .btn-secondary { @apply px-4 py-2 rounded border border-[#111] text-[#111] font-medium text-sm transition-colors hover:bg-[#111] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#111] focus:ring-offset-2; }
+    .btn-ghost { @apply px-3 py-1.5 rounded text-[#666] font-medium text-sm hover:bg-[#e5e7eb] hover:text-[#111] transition-colors; }
+    .card { @apply bg-white border border-[#e5e7eb] rounded-lg p-4; }
+    .token { @apply inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold border-2; }
+    .token-you { @apply border-[#111] bg-[#111]/10 text-[#111]; }
+    .cash { @apply font-mono text-lg font-semibold; }
+    .property { @apply px-2 py-1 rounded text-xs font-medium whitespace-nowrap; }
+    .property-rent { @apply bg-[#10b981]/10 text-[#10b981] border border-[10b981]/20; }
+    .property-owned { @apply bg-[#111]/10 text-[#111] border border-[111]/20; }
+    .property-mortgaged { @apply bg-[#6b7280]/10 text-[#6b7280] border border-[6b7280]/20; }
+    .house { @apply inline-block w-2 h-2 bg-[#10b981] rounded mt-[-1px] mb-[-1px]; }
+    .hotel { @apply inline-block w-4 h-2 bg-[#111] rounded mt-[-1px] mb-[-1px]; }
+    .chat-input { @apply flex-1 px-3 py-2 text-sm border border-[#d1d5db] rounded focus:outline-none focus:ring-2 focus:ring-[#111] focus:border-transparent; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="border-b border-[#e5e7eb]">
+    <div class="px-4 flex items-center justify-between h-14">
+      <div class="flex items-center gap-3">
+        <button class="btn-ghost" id="leaveBtn">← Leave Game</button>
+        <div>
+          <p class="text-xs text-[#666] uppercase tracking-wider">Room Code</p>
+          <p class="text-lg font-mono font-bold text-[#111] tracking-widest" id="roomCode">ABC123</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-[#666]">
+        <div class="flex items-center gap-1">
+          <div class="w-2 h-2 bg-[#10b981] rounded mr-1"></div>
+          <span>3 houses</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="w-4 h-2 bg-[#111] rounded mr-1"></div>
+          <span>1 hotel</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="px-4 pt-12 pb-8">
+    <div class="grid lg:grid-cols-3 gap-6">
+      
+      <!-- Left: Board -->
+      <section class="lg:col-span-2">
+        <div class="card">
+          <div class="relative aspect-square" id="boardContainer">
+            <!-- SVG board -->
+          </div>
+          <div class="mt-4 flex flex-col items-center gap-2">
+            <button class="btn-primary" id="rollBtn">Roll Dice</button>
+            <div class="flex gap-2" id="diceDisplay">
+              <!-- Dice -->
+            </div>
+            <p class="text-xs text-[#666]" id="turnInfo">Your turn</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Player Info & Controls -->
+      <section class="lg:col-span-1 space-y-4">
+        <!-- Player List -->
+        <div class="card">
+          <h3 class="text-lg font-semibold text-[#111] mb-3">Players</h3>
+          <div class="space-y-2" id="playerInfo">
+            <!-- Players -->
+          </div>
+        </div>
+
+        <!-- Your Properties -->
+        <div class="card">
+          <h3 class="text-lg font-semibold text-[#111] mb-3">Your Properties</h3>
+          <div class="space-y-2" id="myProperties">
+            <!-- Properties -->
+          </div>
+          <p class="text-xs text-[#666] mt-2 text-center" id="myCash">Cash: $1,500</p>
+        </div>
+
+        <!-- Game Controls -->
+        <div class="card">
+          <h3 class="text-lg font-semibold text-[#111] mb-3">Controls</h3>
+          <div class="space-y-2" id="controls">
+            <button class="btn-secondary w-full" id="mortgageBtn">Mortgage Property</button>
+            <button class="btn-secondary w-full" id="buildBtn">Build House/Hotel</button>
+            <button class="btn-secondary w-full" id="tradeBtn">Trade</button>
+            <button class="btn-secondary w-full" id="bankruptcyBtn">Declare Bankruptcy</button>
+            <button class="btn-secondary w-full" id="settingsBtn">Game Settings</button>
+          </div>
+        </div>
+
+        <!-- Chat -->
+        <div class="card">
+          <h3 class="text-lg font-semibold text-[#111] mb-3">Chat</h3>
+          <div class="h-48 overflow-y-auto space-y-2 border-t border-[#e5e7eb] pt-3" id="chatMessages">
+            <!-- Chat messages -->
+          </div>
+          <form class="mt-3 flex gap-2" id="chatForm">
+            <input type="text" placeholder="Type a message..." class="chat-input" id="chatInput">
+            <button type="submit" class="btn-primary px-3">Send</button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Actions -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[#e5e7eb] px-4 py-3 hidden md:block">
+    <div class="flex justify-center gap-3">
+      <button class="btn-secondary px-6" id="mobileRoll">Roll</button>
+      <button class="btn-primary px-6" id="mobileBuild">Build</button>
+      <button class="btn-secondary px-6" id="mobileTrade">Trade</button>
+    </div>
+  </footer>
+
+  <script>
+    // --- Mock Data ---
+    const players = [
+      { id: 'me', name: 'You', token: '🎩', color: '#2563eb', cash: 1500, position: 0, isYou: true },
+      { id: 'p2', name: 'Sarah', token: '🚗', color: '#16a34a', cash: 1200, position: 5, isYou: false },
+      { id: 'p3', name: 'Bot-Alice', token: '🐕', color: '#dc2626', cash: 800, position: 12, isYou: false, isBot: true },
+    ];
+    const myId = 'me';
+    const properties = [
+      { id: 0, name: 'GO', color: '#10b981', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 1, name: 'Mediterranean Ave', color: '#3b82f6', ownedBy: 'me', mortgage: false, houses: 0, hotel: 0 },
+      { id: 2, name: 'Community Chest', color: '#6b7280', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 3, name: 'Baltic Ave', color: '#3b82f6', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 4, name: 'Income Tax', color: '#ef4444', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 5, name: 'Reading Railroad', color: '#f59e0b', ownedBy: 'p2', mortgage: false, houses: 0, hotel: 0 },
+      { id: 6, name: 'Oriental Ave', color: '#8b5cf6', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 7, name: 'Chance', color: '#6b7280', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 8, name: 'Vermont Ave', color: '#8b5cf6', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      { id: 9, name: 'Connecticut Ave', color: '#8b5cf6', ownedBy: 'me', mortgage: false, houses: 1, hotel: 0 },
+      { id: 10, name: 'Jail / Just Visiting', color: '#6b7280', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+    ];
+
+    // --- Render Functions ---
+    function renderBoard() {
+      const container = document.getElementById('boardContainer');
+      const size = 400;
+      const cell = size / 11;
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("width", size);
+      svg.setAttribute("height", size);
+      svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+      svg.className = "w-full h-full";
+
+      // Outer border
+      const outer = document.createElementNS(svgNS, "rect");
+      outer.setAttribute("x", 0);
+      outer.setAttribute("y", 0);
+      outer.setAttribute("width", size);
+      outer.setAttribute("height", size);
+      outer.setAttribute("fill", "none");
+      outer.setAttribute("stroke", "#e5e7eb");
+      outer.setAttribute("stroke-width", 1);
+      svg.appendChild(outer);
+
+      // Inner area
+      const inner = document.createElementNS(svgNS, "rect");
+      inner.setAttribute("x", cell);
+      inner.setAttribute("y", cell);
+      inner.setAttribute("width", size - 2*cell);
+      inner.setAttribute("height", size - 2*cell);
+      inner.setAttribute("fill", "#f9fafb");
+      svg.appendChild(inner);
+
+      // Draw properties (simplified: tokens on board)
+      players.forEach((player, playerIndex) => {
+        // Position mapping: each player gets a side
+        let angle, radius;
+        if (playerIndex === 0) { // bottom
+          angle = Math.PI * 1.5;
+          radius = size/2 - cell;
+          const x = size/2 + Math.cos(angle) * radius * 0.5; // fixed offset for sketch
+          const y = size/2 + Math.sin(angle) * radius;
+          drawToken(svg, svgNS, x, y, player.token, player.color);
+        } else if (playerIndex === 1) { // left
+          angle = Math.PI;
+          radius = size/2 - cell;
+          const x = size/2 + Math.cos(angle) * radius * 0.5;
+          const y = size/2 + Math.sin(angle) * radius * 0.5;
+          drawToken(svg, svgNS, x, y, player.token, player.color);
+        } else if (playerIndex === 2) { // top
+          angle = Math.PI * 0.5;
+          radius = size/2 - cell;
+          const x = size/2 + Math.cos(angle) * radius * 0.5;
+          const y = size/2 + Math.sin(angle) * radius * 0.5;
+          drawToken(svg, svgNS, x, y, player.token, player.color);
+        }
+      });
+
+      function drawToken(svg, svgNS, x, y, token, color) {
+        const circle = document.createElementNS(svgNS, "circle");
+        circle.setAttribute("cx", x);
+        circle.setAttribute("cy", y);
+        circle.setAttribute("r", 12);
+        circle.setAttribute("fill", color);
+        circle.setAttribute("opacity", 0.8);
+        svg.appendChild(circle);
+        const text = document.createElementNS(svgNS, "text");
+        text.setAttribute("x", x);
+        text.setAttribute("y", y + 4);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("font-size", "8");
+        text.setAttribute("fill", "#fff");
+        text.textContent = token;
+        svg.appendChild(text);
+      }
+
+      container.innerHTML = '';
+      container.appendChild(svg);
+    }
+
+    function renderPlayerInfo() {
+      const container = document.getElementById('playerInfo');
+      container.innerHTML = players.map(p => {
+        const isYou = p.id === myId;
+        return `
+          <div class="flex items-center gap-2 p-2 rounded ${isYou ? 'bg-[#111]/5' : 'hover:bg-[#f3f4f6]'}" data-id="${p.id}">
+            <div class="token ${isYou ? 'token-you' : ''}" style="background:${p.color};">
+              ${p.token}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-[#111] truncate">${p.name}${p.isYou ? ' <span class="text-xs text-[#111] ml-1">(You)</span>' : ''}${p.isBot ? ' <span class="text-xs text-[#666] ml-1">(Bot)</span>' : ''}</p>
+              <p class="text-xs text-[#666] flex items-center gap-1">
+                <span class="cash">$${p.cash.toLocaleString()}</span>
+                <span class="token" style="background:${p.color};">${p.token}</span>
+              </p>
+            </div>
+            <div class="text-xs text-[#666]">
+              Space ${p.position}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMyProperties() {
+      const container = document.getElementById('myProperties');
+      const myProps = properties.filter(p => p.ownedBy === myId);
+      if (myProps.length === 0) {
+        container.innerHTML = '<p class="text-xs text-[#666] text-center py-2">No properties yet</p>';
+        return;
+      }
+      container.innerHTML = myProps.map(p => {
+        const houses = '🟩'.repeat(Math.min(p.houses, 4));
+        const hotel = p.hotel > 0 ? '🏨' : '';
+        return `
+          <div class="flex items-start gap-2 p-2 rounded border border-[#e5e7eb]">
+            <div class="flex-shrink-0">
+              <span class="text-2xl">${p.id === 0 ? '⚪' : '🟦'}</span>
+            </div>
+            <div class="flex-1 min-w-0 space-y-0.5">
+              <p class="font-medium text-[#111] truncate">${p.name}</p>
+              <p class="text-xs text-[#666] flex items-center gap-1">
+                ${houses}${hotel}
+                ${p.mortgage ? ' <span class="text-xs text-[#666] italic">(Mortgaged)</span>' : ''}
+              </p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderChat() {
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = `
+        <div class="flex gap-2">
+          <span class="text-xs text-[#111] w-20 shrink-0 font-medium">You</span>
+          <span class="text-sm text-[#111]">Anyone want to trade for Connecticut Ave?</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-xs text-[#666] w-20 shrink-0">System</span>
+          <span class="text-sm text-[#111]">Sarah landed on Income Tax and paid $200</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-xs text-[#111] w-20 shrink-0 font-medium">Sarah</span>
+          <span class="text-sm text-[#111]">No thanks, I'm saving for houses</span>
+        </div>
+      `;
+    }
+
+    function renderDice() {
+      const container = document.getElementById('diceDisplay');
+      container.innerHTML = `
+        <div class="w-8 h-8 rounded border border-[#e5e7eb] flex items-center justify-center text-2xl">⚀</div>
+        <div class="w-8 h-8 rounded border border-[#e5e7eb] flex items-center justify-center text-2xl">⚀</div>
+      `;
+    }
+
+    // --- Event Handlers ---
+    function init() {
+      renderBoard();
+      renderPlayerInfo();
+      renderMyProperties();
+      renderChat();
+      renderDice();
+
+      document.getElementById('rollBtn').addEventListener('click', () => {
+        document.getElementById('rollBtn').disabled = true;
+        document.getElementById('rollBtn').textContent = 'Rolling...';
+        setTimeout(() => {
+          document.getElementById('rollBtn').disabled = false;
+          document.getElementById('rollBtn').textContent = 'Roll Dice';
+          // Update dice
+          const dice1 = Math.floor(Math.random()*6)+1;
+          const dice2 = Math.floor(Math.random()*6)+1;
+          const diceEls = document.getElementById('diceDisplay').children;
+          diceEls[0].textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][dice1-1];
+          diceEls[1].textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][dice2-1];
+          // Move player (mock)
+          const me = players.find(p => p.id === myId);
+          me.position = (me.position + dice1 + dice2) % 40;
+          renderPlayerInfo();
+          renderMyProperties();
+          document.getElementById('turnInfo').textContent = 'Waiting for others...';
+        }, 800);
+      });
+
+      document.getElementById('buildBtn').addEventListener('click', () => {
+        alert('Build menu would open');
+      });
+
+      document.getElementById('tradeBtn').addEventListener('click', () => {
+        alert('Trade menu would open');
+      });
+
+      document.getElementById('mortgageBtn').addEventListener('click', () => {
+        alert('Mortgage menu would open');
+      });
+
+      document.getElementById('bankruptcyBtn').addEventListener('click', () => {
+        if (confirm('Declare bankruptcy? This will end your game.')) {
+          alert('Game over');
+        }
+      });
+
+      document.getElementById('settingsBtn').addEventListener('click', () => {
+        alert('Game settings modal');
+      });
+
+      document.getElementById('leaveBtn').addEventListener('click', () => {
+        if (confirm('Leave game? You will be replaced by AI.')) {
+          alert('Would redirect to lobby');
+        }
+      });
+
+      // Chat
+      document.getElementById('chatForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const input = document.getElementById('chatInput');
+        if (!input.value.trim()) return;
+        const msg = document.createElement('div');
+        msg.className = 'flex gap-2';
+        msg.innerHTML = `<span class="text-xs text-[#111] w-20 shrink-0 font-medium">You</span><span class="text-sm text-[#111]">${input.value}</span>`;
+        document.getElementById('chatMessages').appendChild(msg);
+        input.value = '';
+        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+      });
+
+      // Mobile buttons
+      document.getElementById('mobileRoll').addEventListener('click', () => document.getElementById('rollBtn').click());
+      document.getElementById('mobileBuild').addEventListener('click', () => document.getElementById('buildBtn').click());
+      document.getElementById('mobileTrade').addEventListener('click', () => document.getElementById('tradeBtn').click());
+    }
+
+    init();
+  </script>
+</body>
+</html>

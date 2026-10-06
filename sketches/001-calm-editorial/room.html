@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room K7X9MP — Monopoly</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; color: #1a1a2e; background: #f5f5f7; line-height: 1.5; }
+    .btn-primary { @apply px-6 py-2.5 rounded-xl bg-[#1a1a2e] text-white font-medium text-sm transition-all hover:bg-[#0f0f1e] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e] focus:ring-offset-2; }
+    .btn-secondary { @apply px-6 py-2.5 rounded-xl border-2 border-[#1a1a2e] text-[#1a1a2e] font-medium text-sm transition-all hover:bg-[#1a1a2e] hover:text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e] focus:ring-offset-2; }
+    .btn-ghost { @apply px-4 py-2 rounded-lg text-[#666] font-medium text-sm hover:bg-[#e8e8e8] hover:text-[#1a1a2e] transition-colors; }
+    .card { @apply bg-white rounded-2xl shadow-sm border border-[#e8e8e8] p-6; }
+    .token-slot { @apply w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-bold border-2 border-transparent transition-all; }
+    .token-slot.taken { @apply border-[#0066cc] bg-[#0066cc]/5; }
+    .token-slot.available:hover { @apply border-[#ddd] bg-[#fafafa]; cursor: pointer; }
+    .rule-toggle { @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer; }
+    .rule-toggle input { @apply sr-only; }
+    .rule-toggle span { @apply inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition-transform; }
+    .rule-toggle input:checked + span { @apply translate-x-5; }
+    .rule-toggle input:checked ~ .bg { @apply bg-[#0066cc]; }
+    .rule-toggle .bg { @apply absolute inset-0 rounded-full bg-[#e8e8e8] transition-colors; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Top Bar -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#e8e8e8]">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button class="btn-ghost" id="backBtn">← Back</button>
+        <div>
+          <p class="text-xs text-[#999] uppercase tracking-wide">Room Code</p>
+          <p class="text-xl font-mono font-bold text-[#1a1a2e] tracking-widest" id="roomCode">K7X9MP</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="btn-ghost" id="copyBtn" title="Copy room link">🔗 Copy Link</button>
+        <button class="btn-secondary" id="startBtn" disabled>Start Game</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-20 px-4 pb-16">
+    <div class="max-w-5xl mx-auto grid lg:grid-cols-3 gap-6">
+      
+      <!-- Left: Player List -->
+      <section class="lg:col-span-1 space-y-6" aria-label="Players">
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-[#1a1a2e]">Players (2/6)</h2>
+            <span class="text-xs text-[#999]">Host: You</span>
+          </div>
+          <div class="space-y-3" id="playerList">
+            <!-- Players rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Invite Section -->
+        <div class="card">
+          <h3 class="text-sm font-semibold text-[#1a1a2e] mb-4">Invite Friends</h3>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3 p-3 bg-[#fafafa] rounded-xl">
+              <input type="text" value="https://monopoly.app/join/K7X9MP" readonly class="flex-1 text-sm font-mono text-[#1a1a2e] bg-transparent border-0 outline-none" id="inviteLink">
+              <button class="btn-secondary text-sm px-4" id="copyLinkBtn">Copy</button>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn-ghost flex-1 text-sm" id="shareNative">Native Share</button>
+              <button class="btn-ghost flex-1 text-sm" id="shareDiscord">Discord</button>
+              <button class="btn-ghost flex-1 text-sm" id="shareMessages">Messages</button>
+            </div>
+            <p class="text-xs text-[#999]">Link expires in 24 hours. Players join without an account.</p>
+          </div>
+        </div>
+
+        <!-- Chat Preview -->
+        <div class="card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-[#1a1a2e]">Lobby Chat</h3>
+            <button class="btn-ghost text-xs">Open</button>
+          </div>
+          <div class="h-40 overflow-y-auto space-y-2 border-t border-[#e8e8e8] pt-3" id="chatMessages">
+            <div class="flex gap-2">
+              <span class="text-xs text-[#999] w-20 shrink-0">System</span>
+              <span class="text-sm text-[#666]">Room created. Share the code to invite players.</span>
+            </div>
+            <div class="flex gap-2">
+              <span class="text-xs text-[#0066cc] w-20 shrink-0 font-medium">You</span>
+              <span class="text-sm text-[#1a1a2e]">Set Free Parking to $500 jackpot</span>
+            </div>
+          </div>
+          <form class="mt-3 flex gap-2" id="chatForm">
+            <input type="text" placeholder="Type a message..." class="flex-1 px-3 py-2 text-sm border border-[#e8e8e8] rounded-xl outline-none focus:border-[#0066cc]" id="chatInput">
+            <button type="submit" class="btn-primary px-4">Send</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Center: Board Preview + Token Selection -->
+      <section class="lg:col-span-1 space-y-6" aria-label="Game Setup">
+        <!-- Board Mini Preview -->
+        <div class="card">
+          <h3 class="text-sm font-semibold text-[#1a1a2e] mb-4">Board Preview</h3>
+          <div class="aspect-square bg-[#fafafa] rounded-xl border border-[#e8e8e8] relative overflow-hidden" id="boardPreview">
+            <!-- SVG board rendered by JS -->
+          </div>
+          <p class="text-xs text-[#999] mt-3 text-center">Classic board • 40 spaces • Custom themes coming soon</p>
+        </div>
+
+        <!-- Token Selection -->
+        <div class="card">
+          <h3 class="text-sm font-semibold text-[#1a1a2e] mb-4">Choose Your Token</h3>
+          <p class="text-xs text-[#999] mb-4">Tap an available token. First come, first served.</p>
+          <div class="grid grid-cols-5 gap-3" id="tokenGrid">
+            <!-- Tokens rendered by JS -->
+          </div>
+          <p class="text-xs text-[#999] mt-3 text-center" id="tokenStatus">Your token: <span class="font-medium text-[#1a1a2e]" id="myToken">Not selected</span></p>
+        </div>
+
+        <!-- Color Selection -->
+        <div class="card">
+          <h3 class="text-sm font-semibold text-[#1a1a2e] mb-4">Player Color</h3>
+          <div class="flex flex-wrap gap-2" id="colorGrid">
+            <!-- Colors rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Game Settings -->
+      <section class="lg:col-span-1 space-y-6" aria-label="Game Settings">
+        <div class="card">
+          <h2 class="text-lg font-semibold text-[#1a1a2e] mb-6">Game Rules</h2>
+          
+          <div class="space-y-5" id="rulesList">
+            <!-- Rules rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Game Info -->
+        <div class="card">
+          <h3 class="text-sm font-semibold text-[#1a1a2e] mb-4">Game Info</h3>
+          <dl class="space-y-3 text-sm">
+            <div class="flex justify-between"><dt class="text-[#666]">Starting Cash</dt><dd class="font-medium text-[#1a1a2e]">$1,500</dd></div>
+            <div class="flex justify-between"><dt class="text-[#666]">Salary (Pass GO)</dt><dd class="font-medium text-[#1a1a2e]">$200</dd></div>
+            <div class="flex justify-between"><dt class="text-[#666]">Max Players</dt><dd class="font-medium text-[#1a1a2e]">6</dd></div>
+            <div class="flex justify-between"><dt class="text-[#666]">AI Difficulty</dt><dd class="font-medium text-[#1a1a2e]">Medium</dd></div>
+            <div class="flex justify-between"><dt class="text-[#666]">Turn Timer</dt><dd class="font-medium text-[#1a1a2e]">90 seconds</dd></div>
+          </dl>
+        </div>
+
+        <!-- Add AI Bots -->
+        <div class="card">
+          <h3 class="text-sm font-semibold text-[#1a1a2e] mb-4">Fill Empty Seats</h3>
+          <div class="flex items-center gap-3 mb-3">
+            <label class="btn-ghost text-sm flex-1 text-center" id="addBotEasy">
+              <input type="radio" name="botDiff" value="easy" class="sr-only"> Easy
+            </label>
+            <label class="btn-ghost text-sm flex-1 text-center ring-2 ring-[#0066cc] bg-[#0066cc]/5" id="addBotMedium">
+              <input type="radio" name="botDiff" value="medium" checked class="sr-only"> Medium
+            </label>
+            <label class="btn-ghost text-sm flex-1 text-center" id="addBotHard">
+              <input type="radio" name="botDiff" value="hard" class="sr-only"> Hard
+            </label>
+          </div>
+          <button class="btn-secondary w-full" id="addBotBtn">+ Add Bot</button>
+          <p class="text-xs text-[#999] mt-2 text-center">Bots can be kicked before game starts</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Sheet (Token/Color picker) -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl border-t border-[#e8e8e8] md:hidden transform translate-y-full transition-transform duration-300 z-40" id="bottomSheet">
+    <div class="px-4 py-3 border-b border-[#e8e8e8] flex items-center justify-between">
+      <h3 class="font-semibold text-[#1a1a2e]" id="sheetTitle">Choose Token</h3>
+      <button class="text-2xl text-[#999]" id="closeSheet">&times;</button>
+    </div>
+    <div class="p-4 max-h-[60vh] overflow-y-auto" id="sheetContent"></div>
+  </div>
+
+  <script>
+    // --- Data ---
+    const tokens = [
+      { id: 'top-hat', emoji: '🎩', name: 'Top Hat' },
+      { id: 'car', emoji: '🚗', name: 'Race Car' },
+      { id: 'dog', emoji: '🐕', name: 'Scottie Dog' },
+      { id: 'thimble', emoji: '🪡', name: 'Thimble' },
+      { id: 'boot', emoji: '👢', name: 'Boot' },
+      { id: 'wheelbarrow', emoji: '🛒', name: 'Wheelbarrow' },
+      { id: 'battleship', emoji: '⚓', name: 'Battleship' },
+      { id: 'cat', emoji: '🐈', name: 'Cat' },
+      { id: 'penguin', emoji: '🐧', name: 'Penguin' },
+      { id: 'rubber-duck', emoji: '🦆', name: 'Rubber Duck' },
+      { id: 'trex', emoji: '🦖', name: 'T-Rex' },
+      { id: 'rocket', emoji: '🚀', name: 'Rocket' },
+    ];
+
+    const colors = [
+      { id: 'red', hex: '#dc2626', name: 'Red' },
+      { id: 'blue', hex: '#2563eb', name: 'Blue' },
+      { id: 'green', hex: '#16a34a', name: 'Green' },
+      { id: 'yellow', hex: '#ca8a04', name: 'Yellow' },
+      { id: 'purple', hex: '#9333ea', name: 'Purple' },
+      { id: 'orange', hex: '#ea580c', name: 'Orange' },
+      { id: 'teal', hex: '#0d9488', name: 'Teal' },
+      { id: 'pink', hex: '#db2777', name: 'Pink' },
+    ];
+
+    const rules = [
+      { id: 'freeParkingJackpot', label: 'Free Parking Jackpot', desc: 'Taxes & fees collect in center; landing on Free Parking wins pot', default: true },
+      { id: 'doubleRentOnGo', label: 'Double Rent on GO', desc: 'Landing exactly on GO pays $400 instead of $200', default: false },
+      { id: 'noAuction', label: 'No Property Auctions', desc: 'Unbought properties return to bank instead of auction', default: false },
+      { id: 'unlimitedHouses', label: 'Unlimited Houses', desc: 'No 32-house limit; build as many as you can afford', default: false },
+      { id: 'freeMortgage', label: 'Free Mortgage Lift', desc: 'No 10% interest to unmortgage properties', default: false },
+      { id: 'snakeEyesBonus', label: 'Snake Eyes Bonus', desc: 'Rolling double-1 gives $500 bonus', default: false },
+      { id: 'propertyTrading', label: 'Property Trading', desc: 'Allow player-to-player property trades', default: true },
+      { id: 'cashTrading', label: 'Cash Trading', desc: 'Allow cash-only trades between players', default: true },
+      { id: 'turnTimer', label: 'Turn Timer (90s)', desc: 'Auto-roll after 90 seconds of inactivity', default: true },
+      { id: 'aiSubstitution', label: 'AI Substitution', desc: 'Replace disconnected players with AI after 60s', default: true },
+    ];
+
+    // --- State ---
+    let players = [
+      { id: 'me', name: 'You', token: null, color: colors[0], isHost: true, isBot: false },
+      { id: 'p2', name: 'Sarah', token: tokens[0], color: colors[1], isHost: false, isBot: false },
+    ];
+    let myPlayerId = 'me';
+    let selectedToken = null;
+    let selectedColor = colors[0];
+    let activeSheet = null;
+
+    // --- Render Functions ---
+    function renderPlayers() {
+      const container = document.getElementById('playerList');
+      container.innerHTML = players.map(p => `
+        <div class="flex items-center gap-3 p-3 rounded-xl ${p.id === myPlayerId ? 'bg-[#0066cc]/5' : 'hover:bg-[#fafafa]'}" data-id="${p.id}">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold ${p.token ? `bg-${p.color.id}/10 text-${p.color.id} border-2 border-${p.color.id}/20` : 'bg-[#fafafa] text-[#ccc]'}">
+            ${p.token ? p.token.emoji : '?'}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-[#1a1a2e] truncate">${p.name}${p.isHost ? ' <span class="text-xs text-[#0066cc] ml-1">(Host)</span>' : ''}${p.isBot ? ' <span class="text-xs text-[#999] ml-1">(Bot)</span>' : ''}</p>
+            <p class="text-xs text-[#999]">${p.color.name} • ${p.token?.name || 'No token'}</p>
+          </div>
+          ${!p.isBot && p.id !== myPlayerId ? '<button class="btn-ghost text-xs px-2 py-1">Kick</button>' : ''}
+        </div>
+      `).join('');
+    }
+
+    function renderTokens() {
+      const container = document.getElementById('tokenGrid');
+      const takenTokens = new Set(players.filter(p => p.token).map(p => p.token.id));
+      container.innerHTML = tokens.map(t => {
+        const taken = takenTokens.has(t.id);
+        const isMine = selectedToken?.id === t.id;
+        return `
+          <button class="token-slot ${taken ? 'taken' : 'available'} ${isMine ? 'ring-2 ring-[#0066cc]' : ''}" 
+                  data-token="${t.id}" ${taken && !isMine ? 'disabled' : ''}>
+            ${t.emoji}
+          </button>
+        `;
+      }).join('');
+      document.getElementById('myToken').textContent = selectedToken?.name || 'Not selected';
+    }
+
+    function renderColors() {
+      const container = document.getElementById('colorGrid');
+      const takenColors = new Set(players.filter(p => p.id !== myPlayerId).map(p => p.color.id));
+      container.innerHTML = colors.map(c => {
+        const taken = takenColors.has(c.id);
+        const isMine = selectedColor.id === c.id;
+        return `
+          <button class="w-10 h-10 rounded-xl border-3 transition-all ${isMine ? 'ring-2 ring-offset-2 ring-[#0066cc]' : ''} ${taken ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 cursor-pointer'}" 
+                  style="background:${c.hex}" data-color="${c.id}" ${taken ? 'disabled' : ''}></button>
+        `;
+      }).join('');
+    }
+
+    function renderRules() {
+      const container = document.getElementById('rulesList');
+      container.innerHTML = rules.map(r => `
+        <div class="flex items-start gap-3">
+          <label class="rule-toggle mt-0.5 flex-shrink-0">
+            <input type="checkbox" data-rule="${r.id}" ${r.default ? 'checked' : ''}>
+            <span class="bg"></span>
+            <span></span>
+          </label>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-[#1a1a2e]">${r.label}</p>
+            <p class="text-xs text-[#999]">${r.desc}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderBoardPreview() {
+      const container = document.getElementById('boardPreview');
+      const size = 300;
+      const cell = size / 11;
+      const spaces = [
+        'GO', 'Mediterranean', 'Community Chest', 'Baltic', 'Income Tax', 'Reading RR', 'Oriental', 'Chance', 'Vermont', 'Connecticut', 'Jail',
+        'St. Charles', 'Electric Co', 'States', 'Virginia', 'Pennsylvania RR', 'St. James', 'Community Chest', 'Tennessee', 'New York', 'Free Parking',
+        'Kentucky', 'Chance', 'Indiana', 'Illinois', 'B&O RR', 'Atlantic', 'Ventnor', 'Water Works', 'Marvin Gardens', 'Go to Jail',
+        'Pacific', 'North Carolina', 'Community Chest', 'Pennsylvania', 'Short Line', 'Chance', 'Park Place', 'Luxury Tax', 'Boardwalk'
+      ];
+      // Simplified SVG - just the border cells
+      let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="w-full h-full">`;
+      // Outer border
+      svg += `<rect x="0" y="0" width="${size}" height="${size}" fill="none" stroke="#e8e8e8" stroke-width="2"/>`;
+      // Inner area
+      svg += `<rect x="${cell}" y="${cell}" width="${size - 2*cell}" height="${size - 2*cell}" fill="#fafafa"/>`;
+      // Corner labels
+      const corners = [
+        { x: size - cell/2, y: size - cell/2, text: 'GO', color: '#16a34a' },
+        { x: cell/2, y: size - cell/2, text: 'Jail', color: '#dc2626' },
+        { x: cell/2, y: cell/2, text: 'Free Parking', color: '#ca8a04' },
+        { x: size - cell/2, y: cell/2, text: 'Go to Jail', color: '#dc2626' },
+      ];
+      corners.forEach(c => {
+        svg += `<text x="${c.x}" y="${c.y}" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="600" fill="${c.color}" font-family="Inter">${c.text}</text>`;
+      });
+      // Side labels (abbreviated)
+      const sides = [
+        { positions: Array(9).fill(0).map((_,i) => ({ x: size - cell/2 - (i+1)*cell, y: size - cell/2 })) }, // bottom
+        { positions: Array(9).fill(0).map((_,i) => ({ x: cell/2, y: size - cell/2 - (i+1)*cell })) }, // left
+        { positions: Array(9).fill(0).map((_,i) => ({ x: cell/2 + (i+1)*cell, y: cell/2 })) }, // top
+        { positions: Array(9).fill(0).map((_,i) => ({ x: size - cell/2, y: cell/2 + (i+1)*cell })) }, // right
+      ];
+      svg += '</svg>';
+      container.innerHTML = svg;
+    }
+
+    function renderChat() {
+      // Static for sketch
+    }
+
+    // --- Event Handlers ---
+    function init() {
+      renderPlayers();
+      renderTokens();
+      renderColors();
+      renderRules();
+      renderBoardPreview();
+
+      // Token selection
+      document.getElementById('tokenGrid').addEventListener('click', e => {
+        const btn = e.target.closest('.token-slot');
+        if (!btn || btn.disabled) return;
+        const tokenId = btn.dataset.token;
+        const token = tokens.find(t => t.id === tokenId);
+        selectedToken = token;
+        // Update my player
+        const me = players.find(p => p.id === myPlayerId);
+        me.token = token;
+        renderTokens();
+        renderPlayers();
+        checkStartReady();
+      });
+
+      // Color selection
+      document.getElementById('colorGrid').addEventListener('click', e => {
+        const btn = e.target.closest('button[data-color]');
+        if (!btn || btn.disabled) return;
+        const colorId = btn.dataset.color;
+        selectedColor = colors.find(c => c.id === colorId);
+        const me = players.find(p => p.id === myPlayerId);
+        me.color = selectedColor;
+        renderColors();
+        renderPlayers();
+      });
+
+      // Rules toggles
+      document.getElementById('rulesList').addEventListener('change', e => {
+        if (e.target.matches('input[data-rule]')) {
+          const rule = rules.find(r => r.id === e.target.dataset.rule);
+          rule.enabled = e.target.checked;
+        }
+      });
+
+      // Add bot
+      document.getElementById('addBotBtn').addEventListener('click', () => {
+        if (players.length >= 6) return;
+        const diff = document.querySelector('input[name="botDiff"]:checked').value;
+        const botNames = ['Bot-Alice', 'Bot-Bob', 'Bot-Carol', 'Bot-Dave', 'Bot-Eve'];
+        const availableTokens = tokens.filter(t => !players.some(p => p.token?.id === t.id));
+        const availableColors = colors.filter(c => !players.some(p => p.color.id === c.id));
+        const newBot = {
+          id: `bot-${Date.now()}`,
+          name: botNames[players.length - 2],
+          token: availableTokens[0] || null,
+          color: availableColors[0] || colors[0],
+          isHost: false,
+          isBot: true,
+          difficulty: diff
+        };
+        players.push(newBot);
+        renderPlayers();
+        renderTokens();
+        renderColors();
+        checkStartReady();
+      });
+
+      // Copy link
+      document.getElementById('copyLinkBtn').addEventListener('click', () => {
+        navigator.clipboard.writeText(document.getElementById('inviteLink').value);
+        const btn = document.getElementById('copyLinkBtn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 1500);
+      });
+
+      // Copy room code
+      document.getElementById('copyBtn').addEventListener('click', () => {
+        navigator.clipboard.writeText('K7X9MP');
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = '🔗 Copy Link', 1500);
+      });
+
+      // Chat
+      document.getElementById('chatForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const input = document.getElementById('chatInput');
+        if (!input.value.trim()) return;
+        const msg = document.createElement('div');
+        msg.className = 'flex gap-2';
+        msg.innerHTML = `<span class="text-xs text-[#0066cc] w-20 shrink-0 font-medium">You</span><span class="text-sm text-[#1a1a2e]">${input.value}</span>`;
+        document.getElementById('chatMessages').appendChild(msg);
+        input.value = '';
+        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+      });
+
+      // Start button
+      function checkStartReady() {
+        const me = players.find(p => p.id === myPlayerId);
+        const ready = me.token && players.length >= 2;
+        document.getElementById('startBtn').disabled = !ready;
+      }
+      checkStartReady();
+
+      document.getElementById('startBtn').addEventListener('click', () => {
+        alert('Would navigate to /game/K7X9MP — start game engine');
+      });
+
+      // Back button
+      document.getElementById('backBtn').addEventListener('click', () => {
+        alert('Would navigate to /landing');
+      });
+
+      // Mobile bottom sheet triggers
+      document.querySelectorAll('#tokenGrid, #colorGrid').forEach(grid => {
+        grid.addEventListener('click', e => {
+          if (window.innerWidth < 768) {
+            const btn = e.target.closest('button[data-token], button[data-color]');
+            if (btn) openSheet(btn.dataset.token ? 'token' : 'color');
+          }
+        });
+      });
+
+      document.getElementById('closeSheet').addEventListener('click', closeSheet);
+    }
+
+    function openSheet(type) {
+      activeSheet = type;
+      const sheet = document.getElementById('bottomSheet');
+      const title = document.getElementById('sheetTitle');
+      const content = document.getElementById('sheetContent');
+      
+      if (type === 'token') {
+        title.textContent = 'Choose Your Token';
+        const takenTokens = new Set(players.filter(p => p.token).map(p => p.token.id));
+        content.innerHTML = `
+          <p class="text-xs text-[#999] mb-4">Tap an available token</p>
+          <div class="grid grid-cols-4 gap-3" id="sheetTokens">
+            ${tokens.map(t => {
+              const taken = takenTokens.has(t.id);
+              const isMine = selectedToken?.id === t.id;
+              return `<button class="token-slot ${taken ? 'taken' : 'available'} ${isMine ? 'ring-2 ring-[#0066cc]' : ''} w-14 h-14 text-3xl" data-token="${t.id}" ${taken && !isMine ? 'disabled' : ''}>${t.emoji}</button>`;
+            }).join('')}
+          </div>
+        `;
+        content.querySelectorAll('button[data-token]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const token = tokens.find(t => t.id === btn.dataset.token);
+            selectedToken = token;
+            players.find(p => p.id === myPlayerId).token = token;
+            renderTokens();
+            renderPlayers();
+            checkStartReady();
+            closeSheet();
+          });
+        });
+      } else {
+        title.textContent = 'Choose Your Color';
+        const takenColors = new Set(players.filter(p => p.id !== myPlayerId).map(p => p.color.id));
+        content.innerHTML = `
+          <p class="text-xs text-[#999] mb-4">Tap an available color</p>
+          <div class="grid grid-cols-4 gap-3" id="sheetColors">
+            ${colors.map(c => {
+              const taken = takenColors.has(c.id);
+              const isMine = selectedColor.id === c.id;
+              return `<button class="w-14 h-14 rounded-xl border-3 ${isMine ? 'ring-2 ring-offset-2 ring-[#0066cc]' : ''} ${taken ? 'opacity-40' : ''}" style="background:${c.hex}" data-color="${c.id}" ${taken ? 'disabled' : ''}></button>`;
+            }).join('')}
+          </div>
+        `;
+        content.querySelectorAll('button[data-color]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selectedColor = colors.find(c => c.id === btn.dataset.color);
+            players.find(p => p.id === myPlayerId).color = selectedColor;
+            renderColors();
+            renderPlayers();
+            closeSheet();
+          });
+        });
+      }
+      sheet.classList.remove('translate-y-full');
+    }
+
+    function closeSheet() {
+      document.getElementById('bottomSheet').classList.add('translate-y-full');
+      activeSheet = null;
+    }
+
+    // Init
+    init();
+  </script>
+</body>
+</html>

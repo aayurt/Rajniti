@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monopoly Online</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #111; background: #fff; line-height: 1.5; }
+    .container { @apply max-w-6xl mx-auto px-4; }
+    .btn-primary { @apply px-5 py-2.5 rounded bg-[#111] text-white font-medium text-sm transition-colors hover:bg-[#000] focus:outline-none focus:ring-2 focus:ring-[#111] focus:ring-offset-2; }
+    .btn-secondary { @apply px-5 py-2.5 rounded border border-[#111] text-[#111] font-medium text-sm transition-colors hover:bg-[#111] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#111] focus:ring-offset-2; }
+    .badge { @apply px-2 py-0.5 rounded text-xs font-medium; }
+    .badge-primary { @apply bg-[#111] text-white; }
+    .badge-secondary { @apply bg-[#f3f4f6] text-[#111]; }
+    .stat { @apply text-center; }
+    .stat-value { @apply block text-2xl font-bold text-[#111]; }
+    .stat-label { @apply block text-sm text-[#666] mt-1; }
+    .card { @apply bg-white border border-[#e5e7eb] rounded-lg p-4; }
+    .input { @apply w-full px-3 py-2 border border-[#d1d5db] rounded focus:outline-none focus:ring-2 focus:ring-[#111] focus:border-transparent; }
+  </style>
+</head>
+<body>
+  <header class="border-b border-[#e5e7eb]">
+    <div class="container flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <a href="#" class="text-2xl font-bold text-[#111]">Monopoly</a>
+        <span class="badge badge-secondary">Beta</span>
+      </div>
+      <div class="hidden md:flex items-center gap-4">
+        <a href="#" class="text-sm text-[#666] hover:text-[#111]">Features</a>
+        <a href="#" class="text-sm text-[#666] hover:text-[#111]">How to Play</a>
+        <a href="#" class="text-sm text-[#666] hover:text-[#111]">Rules</a>
+      </div>
+      <button class="btn-primary" id="playBtn">Play Now</button>
+    </div>
+  </header>
+
+  <section class="py-12">
+    <div class="container text-center">
+      <h1 class="text-3xl md:text-4xl font-bold text-[#111] mb-4">Play Monopoly Online</h1>
+      <p class="text-lg text-[#666] max-w-2xl mx-auto mb-6">
+        Real-time multiplayer Monopoly with custom rules, cross-platform play, and no pay-to-win mechanics.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+        <button class="btn-primary px-6 py-3 text-base" id="heroCreate">Create Game</button>
+        <button class="btn-secondary px-6 py-3 text-base" id="heroJoin">Join Game</button>
+      </div>
+      <p class="text-sm text-[#666]">Or enter a room code to join:</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-2 mt-4">
+        <input type="text" placeholder="Room code (e.g., ABC123)" class="input w-full sm:w-48" id="roomCodeInput">
+        <button class="btn-secondary px-4" id="joinCodeBtn">Join</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-[#f9fafb] py-12">
+    <div class="container">
+      <h2 class="text-2xl font-bold text-[#111] mb-6 text-center">Why Play Here?</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="card text-center">
+          <div class="flex items-center justify-center h-12 mb-4">
+            <div class="w-8 h-8 bg-[#111]/10 text-[#111] flex items-center justify-center rounded">⚡</div>
+          </div>
+          <h3 class="text-lg font-bold text-[#111] mb-2">Real-Time Multiplayer</h3>
+          <p class="text-sm text-[#666]">Socket.io powered with < 100ms latency. Reconnect seamlessly.</p>
+        </div>
+        <div class="card text-center">
+          <div class="flex items-center justify-center h-12 mb-4">
+            <div class="w-8 h-8 bg-[#111]/10 text-[#111] flex items-center justify-center rounded">🎲</div>
+          </div>
+          <h3 class="text-lg font-bold text-[#111] mb-2">Custom Rules</h3>
+          <p class="text-sm text-[#666]">Toggle 15+ house rules per game: Free Parking jackpot, auctions, etc.</p>
+        </div>
+        <div class="card text-center">
+          <div class="flex items-center justify-center h-12 mb-4">
+            <div class="w-8 h-8 bg-[#111]/10 text-[#111] flex items-center justify-center rounded">📱</div>
+          </div>
+          <h3 class="text-lg font-bold text-[#111] mb-2">Cross-Platform</h3>
+          <p class="text-sm text-[#666]">Play on web, iOS, Android. Same games, same account.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12">
+    <div class="container">
+      <h2 class="text-2xl font-bold text-[#111] mb-6 text-center">Stats</h2>
+      <div class="grid md:grid-cols-4 gap-6 text-center">
+        <div class="stat">
+          <p class="stat-value" id="gamesPlayed">12,340</p>
+          <p class="stat-label">Games Played</p>
+        </div>
+        <div class="stat">
+          <p class="stat-value" id="activePlayers">3,210</p>
+          <p class="stat-label">Active Players</p>
+        </div>
+        <div class="stat">
+          <p class="stat-value" id="avgGameTime">42m</p>
+          <p class="stat-label">Avg Game Time</p>
+        </div>
+        <div class="stat">
+          <p class="stat-value" id="rating">4.8★</p>
+          <p class="stat-label">Rating</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-[#e5e7eb]">
+    <div class="container flex flex-col md:flex-row items-center justify-between py-6">
+      <p class="text-xs text-[#666]">© 2025 Monopoly Online. Not affiliated with Hasbro.</p>
+      <div class="flex items-center gap-4 text-xs text-[#666]">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">GitHub</a>
+        <a href="#">Discord</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Counter animation
+    const stats = [
+      { el: document.getElementById('gamesPlayed'), target: 12340 },
+      { el: document.getElementById('activePlayers'), target: 3210 },
+      { el: document.getElementById('avgGameTime'), target: 42 },
+      { el: document.getElementById('rating'), target: 4.8 }
+    ];
+    
+    function animateCount(stat) {
+      const duration = 1500;
+      const startTime = performance.now();
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        let current;
+        if (Number.isInteger(stat.target)) {
+          current = Math.floor(stat.target * eased);
+          stat.el.textContent = current.toLocaleString();
+        } else {
+          current = stat.target * eased;
+          stat.el.textContent = current.toFixed(1) + (stat.el.id === 'rating' ? '★' : 'm');
+        }
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          stats.forEach(animateCount);
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    observer.observe(document.querySelector('section:nth-child(3)'));
+    
+    // Button handlers
+    document.getElementById('playBtn').addEventListener('click', () => {
+      alert('Would show modal: Create or Join');
+    });
+    document.getElementById('heroCreate').addEventListener('click', () => {
+      alert('Would navigate to /room/new');
+    });
+    document.getElementById('heroJoin').addEventListener('click', () => {
+      alert('Would focus room code input');
+    });
+    document.getElementById('joinCodeBtn').addEventListener('click', () => {
+      const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+      if (code.length === 6) {
+        alert(`Would join room ${code}`);
+      } else {
+        alert('Please enter a 6-character room code');
+      }
+    });
+    document.getElementById('roomCodeInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') document.getElementById('joinCodeBtn').click();
+    });
+  </script>
+</body>
+</html>

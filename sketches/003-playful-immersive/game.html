@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game — Monopoly Online</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Press Start 2E', system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #fff; background: linear-gradient(135deg, #1a1a2e, #16213e); line-height: 1.5; }
+    .btn-primary { @apply px-4 py-2 rounded-xl bg-gradient-to-r from-[#ff9a56] to-[#ff6a88] text-white font-bold text-base transition-all hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#ff9a56] focus:ring-offset-2; }
+    .btn-secondary { @apply px-4 py-2 rounded-xl border-2 border-[#ff9a56] text-[#ff9a56] font-bold text-base transition-all hover:bg-[#ff9a56] hover:text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#ff9a56] focus:ring-offset-2; }
+    .btn-ghost { @apply px-3 py-1.5 rounded-lg text-[#ff9a56] font-bold text-sm hover:bg-[#ff9a56]/10 hover:text-white transition-all; }
+    .card { @apply bg-gradient-to-br from-[#16213e]/80 to-[#0f172a]/80 rounded-2xl border border-[#ff9a56]/20 p-4 backdrop-blur-sm; }
+    .token { @apply inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold border-2 border-white; }
+    .token-you { @apply border-[#ff9a56] bg-[#ff9a56]/20; }
+    .cash { @apply font-mono text-lg font-bold text-[#4cc9f0]; }
+    .property { @apply px-2 py-1 rounded text-xs font-medium whitespace-nowrap; }
+    .property-rent { @apply bg-[#10b981]/10 text-[#10b981] border border-[10b981]/20; }
+    .property-owned { @apply bg-gradient-to-r from-[#ff9a56] to-[#ff6a88]/20 text-[#fff] border border-[ff9a56]/20; }
+    .property-mortgaged { @apply bg-[#6b7280]/10 text-[#6b7280] border border-[6b7280]/20; }
+    .house { @apply inline-block w-2 h-2 bg-[#10b981] rounded mt-[-1px] mb-[-1px]; }
+    .hotel { @apply inline-block w-4 h-2 bg-gradient-to-r from-[#ff9a56] to-[#ff6a88] rounded mt-[-1px] mb-[-1px]; }
+    .chat-input { @apply flex-1 px-3 py-2 text-sm border border-[#d1d5db] rounded focus:outline-none focus:ring-2 focus:ring-[#ff9a56] focus:border-transparent; }
+  </style>
+</head>
+<body class="min-h-screen relative overflow-hidden">
+  <!-- Animated Background -->
+  <div class="absolute inset-0">
+    <canvas id="bgCanvas"></canvas>
+  </div>
+  
+  <!-- Content -->
+  <div class="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 pb-20">
+    
+    <!-- Header -->
+    <header class="mb-6 text-center">
+      <h1 class="text-2xl font-bold text-gradient to-r from-[#ff9a56] to-[#ff6a88] bg-clip-text text-transparent mb-2">
+        GAME ABC123
+      </h1>
+      <p class="text-sm text-[#ff9a56]">Your Turn • 4 Players</p>
+      <div class="flex items-center justify-between w-full max-w-4xl">
+        <div class="flex items-center gap-3">
+          <button class="btn-ghost" id="leaveBtn">← LEAVE</button>
+          <div>
+            <p class="text-xs text-[#ff9a56] uppercase tracking-wider">Room Code</p>
+            <p class="text-lg font-mono font-bold text-[#fff] tracking-widest" id="roomCode">ABC123</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-[#ff9a56]">
+          <div class="flex items-center gap-1">
+            <div class="w-2 h-2 bg-[#10b981] rounded mr-1"></div>
+            <span>3 houses</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <div class="w-4 h-2 bg-gradient-to-r from-[#ff9a56] to-[#ff6a88] rounded mr-1"></div>
+            <span>1 hotel</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="w-full max-w-4xl">
+      <div class="grid lg:grid-cols-3 gap-6">
+        
+        <!-- Left: Board -->
+        <section class="lg:col-span-2">
+          <div class="card">
+            <div class="relative aspect-square" id="boardContainer">
+              <!-- SVG board -->
+            </div>
+            <div class="mt-4 flex flex-col items-center gap-2">
+              <button class="btn-primary" id="rollBtn">ROLL DICE</button>
+              <div class="flex gap-2" id="diceDisplay">
+                <!-- Dice -->
+              </div>
+              <p class="text-xs text-[#ff9a56]" id="turnInfo">Your turn</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right: Player Info & Controls -->
+        <section class="lg:col-span-1 space-y-4">
+          <!-- Player List -->
+          <div class="card">
+            <h2 class="text-lg font-bold text-[#ff9a56] mb-3">Players</h2>
+            <div class="space-y-2" id="playerInfo">
+              <!-- Players -->
+            </div>
+          </div>
+
+          <!-- Your Properties -->
+          <div class="card">
+            <h2 class="text-lg font-bold text-[#ff9a56] mb-3">Your Properties</h2>
+            <div class="space-y-2" id="myProperties">
+              <!-- Properties -->
+            </div>
+            <p class="text-xs text-[#ff9a56] mt-2 text-center" id="myCash">Cash: $1,500</p>
+          </div>
+
+          <!-- Game Controls -->
+          <div class="card">
+            <h2 class="text-lg font-bold text-[#ff9a56] mb-3">Controls</h2>
+            <div class="space-y-2" id="controls">
+              <button class="btn-secondary w-full" id="mortgageBtn">MORTGAGE PROPERTY</button>
+              <button class="btn-secondary w-full" id="buildBtn">BUILD HOUSE/HOTEL</button>
+              <button class="btn-secondary w-full" id="tradeBtn">TRADE</button>
+              <button class="btn-secondary w-full" id="bankruptcyBtn">DECLARE BANKRUPTCY</button>
+              <button class="btn-secondary w-full" id="settingsBtn">GAME SETTINGS</button>
+            </div>
+          </div>
+
+          <!-- Chat -->
+          <div class="card">
+            <h2 class="text-lg font-bold text-[#ff9a56] mb-3">Chat</h2>
+            <div class="h-48 overflow-y-auto space-y-2 border-t border-[#ff9a56]/20 pt-3" id="chatMessages">
+              <!-- Chat messages -->
+            </div>
+            <form class="mt-3 flex gap-2" id="chatForm">
+              <input type="text" placeholder="Type a message..." class="chat-input" id="chatInput">
+              <button type="submit" class="btn-primary px-3">SEND</button>
+            </form>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Mobile Bottom Actions -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[#e5e7eb] px-4 py-3 hidden md:block">
+      <div class="flex justify-center gap-3">
+        <button class="btn-secondary px-6" id="mobileRoll">ROLL</button>
+        <button class="btn-primary px-6" id="mobileBuild">BUILD</button>
+        <button class="btn-secondary px-6" id="mobileTrade">TRADE</button>
+      </div>
+    </footer>
+
+    <script>
+      // --- Mock Data ---
+      const players = [
+        { id: 'me', name: 'You', token: '🎩', color: '#2563eb', cash: 1500, position: 0, isYou: true },
+        { id: 'p2', name: 'Sarah', token: '🚗', color: '#16a34a', cash: 1200, position: 5, isYou: false },
+        { id: 'p3', name: 'Bot-Alice', token: '🐕', color: '#dc2626', cash: 800, position: 12, isYou: false, isBot: true },
+      ];
+      const myId = 'me';
+      const properties = [
+        { id: 0, name: 'GO', color: '#10b981', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+        { id: 1, name: 'Mediterranean Ave', color: '#3b82f6', ownedBy: 'me', mortgage: false, houses: 0, hotel: 0 },
+        { id: 2, name: 'Community Chest', color: '#6b7280', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+        { id: 3, name: 'Baltic Ave', color: '#3b82f6', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+        { id: 4, name: 'Income Tax', color: '#ef4444', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+        { id: 5, name: 'Reading Railroad', color: '#f59e0b', ownedBy: 'p2', mortgage: false, houses: 0, hotel: 0 },
+        { id: 6, name: 'Oriental Ave', color: '#8b5cf6', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+        { id: 7, name: 'Chance', color: '#6b7280', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+        { id: 8, name: 'Vermont Ave', color: '#8b5cf6', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+        { id: 9, name: 'Connecticut Ave', color: '#8b5cf6', ownedBy: 'me', mortgage: false, houses: 1, hotel: 0 },
+        { id: 10, name: 'Jail / Just Visiting', color: '#6b7280', ownedBy: null, mortgage: false, houses: 0, hotel: 0 },
+      ];
+
+      // --- Render Functions ---
+      function renderBoard() {
+        const container = document.getElementById('boardContainer');
+        const size = 400;
+        const cell = size / 11;
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("width", size);
+        svg.setAttribute("height", size);
+        svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+        svg.className = "w-full h-full";
+
+        // Outer border with gradient effect (simulated)
+        const outer = document.createElementNS(svgNS, "rect");
+        outer.setAttribute("x", 0);
+        outer.setAttribute("y", 0);
+        outer.setAttribute("width", size);
+        outer.setAttribute("height", size);
+        outer.setAttribute("fill", "none");
+        outer.setAttribute("stroke", "#ff9a56");
+        outer.setAttribute("stroke-width", 2);
+        svg.appendChild(outer);
+
+        // Inner area
+        const inner = document.createElementNS(svgNS, "rect");
+        inner.setAttribute("x", cell);
+        inner.setAttribute("y", cell);
+        inner.setAttribute("width", size - 2*cell);
+        inner.setAttribute("height", size - 2*cell);
+        inner.setAttribute("fill", "#16213e");
+        svg.appendChild(inner);
+
+        // Draw property ownership as colored strips on sides
+        // Bottom: properties 1-9 (Mediterranean to Connecticut)
+        properties.slice(1, 10).forEach((prop, index) => {
+          if (prop.ownedBy === null) return;
+          const owner = players.find(p => p.id === prop.ownedBy);
+          if (!owner) return;
+          const progress = index / 9; // 0 to 1
+          const x = cell + (size - 2*cell) * progress;
+          const y = size - cell;
+          const height = 8;
+          const rect = document.createElementNS(svgNS, "rect");
+          rect.setAttribute("x", x - 1);
+          rect.setAttribute("y", y - height/2);
+          rect.setAttribute("width", 2);
+          rect.setAttribute("height", height);
+          // Color based on owner
+          if (owner.id === 'me') {
+            rect.setAttribute("fill", "url(#myGradient)");
+          } else if (owner.isBot) {
+            rect.setAttribute("fill", "#6b7280");
+          } else {
+            rect.setAttribute("fill", owner.color);
+          }
+          svg.appendChild(rect);
+          
+          // Houses/hotels indicator
+          if (prop.houses > 0 || prop.hotel > 0) {
+            const indicator = document.createElementNS(svgNS, "rect");
+            indicator.setAttribute("x", x - 3);
+            indicator.setAttribute("y", y - height/2 - 4);
+            indicator.setAttribute("width", 6);
+            indicator.setAttribute("height", 4);
+            if (prop.hotel > 0) {
+              indicator.setAttribute("fill", "#fff");
+            } else {
+              indicator.setAttribute("fill", "#10b981");
+            }
+            svg.appendChild(indicator);
+          }
+        });
+        
+        // Left side: properties 11-19 (St. Charles to Water Works)
+        properties.slice(11, 20).forEach((prop, index) => {
+          if (prop.ownedBy === null) return;
+          const owner = players.find(p => p.id === prop.ownedBy);
+          if (!owner) return;
+          const progress = index / 9;
+          const x = cell;
+          const y = cell + (size - 2*cell) * progress;
+          const width = 8;
+          const rect = document.createElementNS(svgNS, "rect");
+          rect.setAttribute("x", x - width/2);
+          rect.setAttribute("y", y - 1);
+          rect.setAttribute("width", width);
+          rect.setAttribute("height", 2);
+          if (owner.id === 'me') {
+            rect.setAttribute("fill", "url(#myGradient)");
+          } else if (owner.isBot) {
+            rect.setAttribute("fill", "#6b7280");
+          } else {
+            rect.setAttribute("fill", owner.color);
+          }
+          svg.appendChild(rect);
+        });
+        
+        // Top side: properties 21-29 (Pacific to Short Line)
+        properties.slice(21, 30).forEach((prop, index) => {
+          if (prop.ownedBy === null) return;
+          const owner = players.find(p => p.id === prop.ownedBy);
+          if (!owner) return;
+          const progress = index / 9;
+          const x = cell + (size - 2*cell) * (1 - progress); // reversed
+          const y = cell;
+          const height = 8;
+          const rect = document.createElementNS(svgNS, "rect");
+          rect.setAttribute("x", x - 1);
+          rect.setAttribute("y", y);
+          rect.setAttribute("width", 2);
+          rect.setAttribute("height", height);
+          if (owner.id === 'me') {
+            rect.setAttribute("fill", "url(#myGradient)");
+          } else if (owner.isBot) {
+            rect.setAttribute("fill", "#6b7280");
+          } else {
+            rect.setAttribute("fill", owner.color);
+          }
+          svg.appendChild(rect);
+        });
+        
+        // Right side: properties 31-39 (Pacific to Boardwalk)
+        properties.slice(31, 40).forEach((prop, index) => {
+          if (prop.ownedBy === null) return;
+          const owner = players.find(p => p.id === prop.ownedBy);
+          if (!owner) return;
+          const progress = index / 9;
+          const x = size - cell;
+          const y = cell + (size - 2*cell) * progress;
+          const width = 8;
+          const rect = document.createElementNS(svgNS, "rect");
+          rect.setAttribute("x", x - width/2);
+          rect.setAttribute("y", y - 1);
+          rect.setAttribute("width", width);
+          rect.setAttribute("height", 2);
+          if (owner.id === 'me') {
+            rect.setAttribute("fill", "url(#myGradient)");
+          } else if (owner.isBot) {
+            rect.setAttribute("fill", "#6b7280");
+          } else {
+            rect.setAttribute("fill", owner.color);
+          }
+          svg.appendChild(rect);
+        });
+        
+        // Add gradient definition for player properties
+        const defs = document.createElementNS(svgNS, "defs");
+        const grad = document.createElementNS(svgNS, "linearGradient");
+        grad.setAttribute("id", "myGradient");
+        grad.setAttribute("x1", "0%");
+        grad.setAttribute("y1", "0%");
+        grad.setAttribute("x2", "100%");
+        grad.setAttribute("y2", "0%");
+        const stop1 = document.createElementNS(svgNS, "stop");
+        stop1.setAttribute("offset", "0%");
+        stop1.setAttribute("stop-color", "#ff9a56");
+        const stop2 = document.createElementNS(svgNS, "stop");
+        stop2.setAttribute("offset", "100%");
+        stop2.setAttribute("stop-color", "#ff6a88");
+        grad.appendChild(stop1);
+        grad.appendChild(stop2);
+        defs.appendChild(grad);
+        svg.appendChild(defs);
+        
+        // Draw special spaces (Jail, Free Parking, etc.) as icons
+        const specials = [
+          { id: 0, label: 'GO', color: '#10b981' },
+          { id: 10, label: 'JAIL', color: '#dc2626' },
+          { id: 20, label: 'FREE PARKING', color: '#ca8a04' },
+          { id: 30, label: 'GO TO JAIL', color: '#dc2626' },
+        ];
+        specials.forEach(s => {
+          let x, y;
+          if (s.id === 0) { // GO - bottom middle
+            x = size/2;
+            y = size - cell/2;
+          } else if (s.id === 10) { // JAIL - left middle
+            x = cell/2;
+            y = size/2;
+          } else if (s.id === 20) { // FREE PARKING - top middle
+            x = size/2;
+            y = cell/2;
+          } else if (s.id === 30) { // GO TO JAIL - right middle
+            x = size - cell/2;
+            y = size/2;
+          }
+          const circle = document.createElementNS(svgNS, "circle");
+          circle.setAttribute("cx", x);
+          circle.setAttribute("cy", y);
+          circle.setAttribute("r", 18);
+          circle.setAttribute("fill", s.color);
+          circle.setAttribute("opacity", 0.2);
+          svg.appendChild(circle);
+          const text = document.createElementNS(svgNS, "text");
+          text.setAttribute("x", x);
+          text.setAttribute("y", y + 4);
+          text.setAttribute("text-anchor", "middle");
+          text.setAttribute("font-size", "10");
+          text.setAttribute("font-weight", "bold");
+          text.setAttribute("fill", "#fff");
+          text.textContent = s.label;
+          svg.appendChild(text);
+        });
+        
+        // Draw player tokens on board
+        players.forEach((player, pIndex) => {
+          let angle, radius;
+          if (pIndex === 0) { // You - bottom side, offset
+            angle = Math.PI * 1.5;
+            radius = size/2 - cell - 10;
+          } else if (pIndex === 1) { // Player 2 - left side
+            angle = Math.PI;
+            radius = size/2 - cell - 10;
+          } else if (pIndex === 2) { // Bot - top side
+            angle = Math.PI * 0.5;
+            radius = size/2 - cell - 10;
+          }
+          const x = size/2 + Math.cos(angle) * radius;
+          const y = size/2 + Math.sin(angle) * radius;
+          
+          const circle = document.createElementNS(svgNS, "circle");
+          circle.setAttribute("cx", x);
+          circle.setAttribute("cy", y);
+          circle.setAttribute("r", 14);
+          circle.setAttribute("fill", player.color);
+          circle.setAttribute("opacity", 0.9);
+          svg.appendChild(circle);
+          
+          const text = document.createElementNS(svgNS, "text");
+          text.setAttribute("x", x);
+          text.setAttribute("y", y + 4);
+          text.setAttribute("text-anchor", "middle");
+          text.setAttribute("font-size", "8");
+          text.setAttribute("fill", "#fff");
+          text.textContent = player.token;
+          svg.appendChild(text);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(svg);
+      }
+
+      function renderPlayerInfo() {
+        const container = document.getElementById('playerInfo');
+        container.innerHTML = players.map(p => {
+          const isYou = p.id === myId;
+          return `
+            <div class="flex items-center gap-2 p-2 rounded ${isYou ? 'bg-gradient-to-r from-[#ff9a56] to-[#ff6a88]/20' : 'hover:bg-[#37415f]/20'}" data-id="${p.id}">
+              <div class="token ${isYou ? 'token-you' : ''}" style="background:${p.color};">
+                ${p.token}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-[#fff] truncate">${p.name}${p.isYou ? ' <span class="text-xs text-[#ff9a56] ml-1">(You)</span>' : ''}${p.isBot ? ' <span class="text-xs text-[#ff9a56] ml-1">(Bot)</span>' : ''}</p>
+                <p class="text-xs text-[#ff9a56] flex items-center gap-1">
+                  <span class="cash">$${p.cash.toLocaleString()}</span>
+                  <span class="token" style="background:${p.color};">${p.token}</span>
+                </p>
+              </div>
+              <div class="text-xs text-[#ff9a56]">
+                Space ${p.position}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderMyProperties() {
+        const container = document.getElementById('myProperties');
+        const myProps = properties.filter(p => p.ownedBy === myId);
+        if (myProps.length === 0) {
+          container.innerHTML = '<p class="text-xs text-[#ff9a56] text-center py-2">No properties yet</p>';
+          return;
+        }
+        container.innerHTML = myProps.map(p => {
+          const houses = '🟩'.repeat(Math.min(p.houses, 4));
+          const hotel = p.hotel > 0 ? '🏨' : '';
+          return `
+            <div class="flex items-start gap-2 p-2 rounded border border-[#ff9a56]/20">
+              <div class="flex-shrink-0">
+                <span class="text-2xl">${p.id === 0 ? '⚪' : '🟦'}</span>
+              </div>
+              <div class="flex-1 min-w-0 space-y-0.5">
+                <p class="font-medium text-[#fff] truncate">${p.name}</p>
+                <p class="text-xs text-[#ff9a56] flex items-center gap-1">
+                  ${houses}${hotel}
+                  ${p.mortgage ? ' <span class="text-xs text-[#ff9a56] italic">(Mortgaged)</span>' : ''}
+                </p>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderChat() {
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = `
+          <div class="flex gap-2">
+            <span class="text-xs text-[#ff9a56] w-20 shrink-0 font-medium">You</span>
+            <span class="text-sm text-[#fff]">Anyone want to trade for Connecticut Ave?</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-xs text-[#ff9a56] w-20 shrink-0">System</span>
+            <span class="text-sm text-[#fff]">Sarah landed on Income Tax and paid $200</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-xs text-[#ff9a56] w-20 shrink-0 font-medium">Sarah</span>
+            <span class="text-sm text-[#fff]">No thanks, I'm saving for houses</span>
+          </div>
+        `;
+      }
+
+      function renderDice() {
+        const container = document.getElementById('diceDisplay');
+        container.innerHTML = `
+          <div class="w-8 h-8 rounded border border-[#ff9a56] flex items-center justify-center text-2xl">⚀</div>
+          <div class="w-8 h-8 rounded border border-[#ff9a56] flex items-center justify-center text-2xl">⚀</div>
+        `;
+      }
+
+      // --- Event Handlers ---
+      function init() {
+        renderBoard();
+        renderPlayerInfo();
+        renderMyProperties();
+        renderChat();
+        renderDice();
+
+        document.getElementById('rollBtn').addEventListener('click', () => {
+          document.getElementById('rollBtn').disabled = true;
+          document.getElementById('rollBtn').textContent = 'ROLLING...';
+          setTimeout(() => {
+            document.getElementById('rollBtn').disabled = false;
+            document.getElementById('rollBtn').textContent = 'ROLL DICE';
+            // Update dice
+            const dice1 = Math.floor(Math.random()*6)+1;
+            const dice2 = Math.floor(Math.random()*6)+1;
+            const diceEls = document.getElementById('diceDisplay').children;
+            diceEls[0].textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][dice1-1];
+            diceEls[1].textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][dice2-1];
+            // Move player (mock)
+            const me = players.find(p => p.id === myId);
+            me.position = (me.position + dice1 + dice2) % 40;
+            renderPlayerInfo();
+            renderMyProperties();
+            document.getElementById('turnInfo').textContent = 'Waiting for others...';
+          }, 800);
+        });
+
+        document.getElementById('buildBtn').addEventListener('click', () => {
+          alert('Build menu would open');
+        });
+
+        document.getElementById('tradeBtn').addEventListener('click', () => {
+          alert('Trade menu would open');
+        });
+
+        document.getElementById('mortgageBtn').addEventListener('click', () => {
+          alert('Mortgage menu would open');
+        });
+
+        document.getElementById('bankruptcyBtn').addEventListener('click', () => {
+          if (confirm('Declare bankruptcy? This will end your game.')) {
+            alert('Game over');
+          }
+        });
+
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+          alert('Game settings modal');
+        });
+
+        document.getElementById('leaveBtn').addEventListener('click', () => {
+          if (confirm('Leave game? You will be replaced by AI.')) {
+            alert('Would redirect to lobby');
+          }
+        });
+
+        // Chat
+        document.getElementById('chatForm').addEventListener('submit', e => {
+          e.preventDefault();
+          const input = document.getElementById('chatInput');
+          if (!input.value.trim()) return;
+          const msg = document.createElement('div');
+          msg.className = 'flex gap-2';
+          msg.innerHTML = `<span class="text-xs text-[#ff9a56] w-20 shrink-0 font-medium">You</span><span class="text-sm text-[#fff]">${input.value}</span>`;
+          document.getElementById('chatMessages').appendChild(msg);
+          input.value = '';
+          document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        });
+
+        // Mobile buttons
+        document.getElementById('mobileRoll').addEventListener('click', () => document.getElementById('rollBtn').click());
+        document.getElementById('mobileBuild').addEventListener('click', () => document.getElementById('buildBtn').click());
+        document.getElementById('mobileTrade').addEventListener('click', () => document.getElementById('tradeBtn').click());
+      }
+
+      // Canvas background animation
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      function resizeCanvas() {
+        canvas.width = window.innerWidth * devicePixelRatio;
+        canvas.height = window.innerHeight * devicePixelRatio;
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      // Dice animation
+      const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+      const dice = [];
+      for (let i = 0; i < 40; i++) {
+        dice.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 3,
+          vy: (Math.random() - 0.5) * 3,
+          size: 18 + Math.random() * 25,
+          face: diceFaces[Math.floor(Math.random() * 6)],
+          color: `hsl(${Math.random() * 60 + 20}, 80%, 60%)`,
+          rotation: Math.random() * Math.PI * 2,
+          spin: (Math.random() - 0.5) * 0.15
+        });
+      }
+
+      function animateBackground() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        dice.forEach(d => {
+          // Update position
+          d.x += d.vx;
+          d.y += d.vy;
+          d.rotation += d.spin;
+
+          // Bounce off walls
+          if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
+          if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+
+          // Draw dice
+          ctx.save();
+          ctx.translate(d.x, d.y);
+          ctx.rotate(d.rotation);
+          ctx.beginPath();
+          ctx.roundRect(-d.size/2, -d.size/2, d.size, d.size, 4);
+          ctx.fillStyle = d.color;
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.font = `${d.size * 0.35}px 'Press Start 2E'`;
+          ctx.fillStyle = '#fff';
+          ctx.fillText(d.face, 0, 0);
+          ctx.restore();
+        });
+        requestAnimationFrame(animateBackground);
+      }
+      animateBackground();
+
+      init();
+    </script>
+  </div>
+</body>
+</html>
