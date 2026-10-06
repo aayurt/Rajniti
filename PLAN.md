@@ -91,7 +91,9 @@ Event = { type: 'roll|move|buy|rent|card|join|leave|chat', text, at }
 ## 5. File Plan
 - App: `index.html` (Vite entry), `src/`, `capacitor.config.ts`, `tailwind/postcss/vite/ts` configs.
 - Docs: `README.md`, `PLAN.md` (this). References: `images/`, `legacy/index.html`.
-- Later: `src/game/decks.ts`, `src/game/engine.ts` (pure rules + tests `tests/game.test.ts`), `src/components/TradeModal.tsx`, `ios/`/`android/` (generated, gitignored).
+- Later: wire `store.tsx` to the engine (`src/game/engine.ts`, `cards.ts`, `rules.ts` —
+  done, 67 colocated Vitest tests green), `src/components/TradeModal.tsx`, `ios/`/`android/`
+  (generated, gitignored). DB: `server/db.ts` (node:sqlite session store, 10 tests green).
 
 ## 6. Milestones (repo-level)
 - **M1 repo + docs** (this commit): git init, GitHub `Rajniti`, `README.md`, `PLAN.md`, working `index.html` demo.
