@@ -1,8 +1,11 @@
+import { useReducer } from 'react';
 import { TILES } from '../data/tiles';
 import { useGame } from '../game/store';
+import { TradeModal, tradeReducer, initialTradeState } from './TradeModal';
 
 export default function RightPanel() {
   const { state, dispatch } = useGame();
+  const [tradeState, tradeDispatch] = useReducer(tradeReducer, initialTradeState);
   const me = state.players.find((p) => p.isYou);
   const myTiles = Object.keys(state.owned)
     .map(Number)
@@ -51,7 +54,7 @@ export default function RightPanel() {
         <div className="flex items-center justify-between mb-2">
           <b className="text-lav text-sm mx-auto">Trades</b>
           <button
-            onClick={() => dispatch({ type: 'CREATE_TRADE' })}
+            onClick={() => tradeDispatch({ type: 'OPEN' })}
             className="bg-[#5b34e8] text-white text-xs font-bold rounded-lg px-3 py-2 min-h-[40px]"
           >
             ⊕ Create
@@ -97,6 +100,17 @@ export default function RightPanel() {
           </div>
         ))}
       </div>
+
+      <TradeModal
+        state={tradeState}
+        dispatch={tradeDispatch}
+        myProperties={myTiles}
+        otherPlayers={state.players.filter(p => !p.isYou && !p.isOut)}
+        onConfirm={(summary) => {
+          dispatch({ type: 'CREATE_TRADE', text: summary } as any);
+          tradeDispatch({ type: 'CLOSE' });
+        }}
+      />
     </div>
   );
 }

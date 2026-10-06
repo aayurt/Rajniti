@@ -65,7 +65,7 @@ type Action =
   | { type: 'BANKRUPT_ME' }
   | { type: 'SEND_CHAT'; text: string }
   | { type: 'SELECT'; id: number | null }
-  | { type: 'CREATE_TRADE' }
+  | { type: 'CREATE_TRADE'; text?: string }
   | { type: 'CANCEL_TRADE'; id: number }
   | { type: 'DISMISS_TRADE_HINT' }
   | { type: 'SET_APPEARANCE'; color: string }
@@ -309,7 +309,7 @@ export function reducer(s: State, a: Action): State {
       const n = s.trades.length + 1;
       return {
         ...s,
-        trades: [...s.trades, { id: nid(), text: `Trade offer #${n} — awaiting another player` }],
+        trades: [...s.trades, { id: nid(), text: a.text || `Trade offer #${n} — awaiting another player` }],
       };
     }
     case 'CANCEL_TRADE':
