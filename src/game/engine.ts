@@ -14,7 +14,7 @@ export interface GameState {
 }
 
 export interface GameEvent {
-  type: 'move' | 'passed-start' | 'buy' | 'rent' | 'eliminate' | 'turn' | 'error';
+  type: 'move' | 'passed-start' | 'buy' | 'rent' | 'eliminate' | 'turn' | 'error' | 'release';
   message: string;
   player?: number;
   tileId?: number;
@@ -98,7 +98,22 @@ export function eliminateIfBankrupt(state: GameState, playerIndex: number): Game
   const player = state.players[playerIndex];
   if (player.cash < 0 && !player.out) {
     player.out = true;
-    return [{ type: 'eliminate', message: `${player.name} is bankrupt and out`, player: playerIndex }];
+    const events: GameEvent[] = [{ type: 'eliminate', message: `${player.name} is bankrupt and out`, player: playerIndex }];
+
+    // Release all owned tiles
+    for (const tileId of Object.keys(state.owners)) {
+      const id = parseInt(tileId, 10);
+      if (state.owners[id] === playerIndex) {
+        delete state.owners[id];
+        events.push({
+          type: 'release',
+          message: `Tile ${id} released because ${player.name} went bankrupt`,
+          player: playerIndex,
+          tileId: id,
+        });
+      }
+    }
+    return events;
   }
   return [];
 }

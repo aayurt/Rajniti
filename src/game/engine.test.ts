@@ -160,6 +160,34 @@ describe('eliminateIfBankrupt', () => {
     eliminateIfBankrupt(s, 0);
     expect(s.players[0].out).toBe(false);
   });
+
+  it('releases all owned tiles and emits release events when bankrupt', () => {
+    const s = createGame(['A', 'B'], 1500);
+    s.owners[1] = 0; // A owns 1
+    s.owners[3] = 0; // A owns 3
+    s.owners[5] = 1; // B owns 5
+
+    s.players[0].cash = -1;
+    const events = eliminateIfBankrupt(s, 0);
+
+    expect(s.players[0].out).toBe(true);
+    expect(s.owners[1]).toBeUndefined();
+    expect(s.owners[3]).toBeUndefined();
+    expect(s.owners[5]).toBe(1); // B's ownership untouched
+
+    // Check events
+    const releaseEvents = events.filter(e => e.type === 'release');
+    expect(releaseEvents).toHaveLength(2);
+    expect(releaseEvents.some(e => e.tileId === 1)).toBe(true);
+    expect(releaseEvents.some(e => e.tileId === 3)).toBe(true);
+
+    // Ensure applyRent charges nothing on released tiles
+    s.current = 1; // B's turn
+    s.players[1].pos = 1;
+    const rentEvents = applyRent(s, 1);
+    expect(rentEvents).toHaveLength(0);
+    expect(s.players[1].cash).toBe(1500);
+  });
 });
 
 describe('advanceTurn', () => {
