@@ -1,7 +1,16 @@
 # Rajniti — Overall Plan (Locked to RichUp.io Design)
 
 > Project: **Rajniti** (github: `Rajniti`). A RichUp.io-style multiplayer Monopoly game.
-> Design source of truth: the RichUp.io screenshot (`index.html` is the current baseline).
+> Prime UI source of truth: **`images/`** — `images/game/` (active game room), `images/settings/` (lobby: appearance picker + game settings + gameplay rules).
+> `legacy/index.html` is the original single-file demo (reference only). Ignore `sketches/` for styling.
+
+## 0. Stack decision (locked)
+
+- **Vite + React 19 + TS + Tailwind v3** — one codebase for web and mobile.
+- **Capacitor 7** (`capacitor.config.ts`, `webDir: dist`, `base: './'`) wraps the static bundle for iOS/Android.
+- **Not Next.js:** Capacitor requires static output; Next would be pinned to `output: export` (no SSR/routes/middleware), keeping its complexity with none of its benefits.
+- Screens: `Lobby` (appearance + settings) ⇄ `GameRoom` (`LeftPanel` + `Board` + `RightPanel`), state in `src/game/store.tsx`, tiles in `src/data/tiles.ts`.
+- Mobile shell: bottom tabs (Board | Players | Chat) < `lg`, `100dvh`, safe-area insets, ≥44px targets; board scrolls horizontally on phones.
 > Ignore `sketches/` for styling. All work must match this dark 3-column game-room look.
 
 ## 1. Design Lock (do not deviate)
@@ -24,10 +33,12 @@
 
 ## 3. Architecture
 
-Keep `index.html` working at every phase. Migrate only when it hurts:
-- Phase 1–3: single `index.html` + Tailwind CDN + vanilla JS (current). Data in `T[40]`, `players[]`, `current`, `renderTokens()`, `drawDice()`, `log()`.
-- Phase 4+: split to `src/` (Vite + TS recommended) — `Board.ts`, `tiles.ts` (40-tile data), `game.ts` (state machine), `components/LeftPanel, Board, Tile, CenterStage, Dice, GameLog, CardPopup, PlayerList, TradeModal, Chat`.
-- Multiplayer later: `GameState` JSON over WebSocket; UI already shaped for it (log feed = event stream, players panel = presence).
+- `src/App.tsx` — shell: lobby ⇄ game + mobile tab nav.
+- `src/game/store.tsx` — reducer state machine (players, dice, log, chat, trades, settings); actions shaped like future WS events.
+- `src/data/tiles.ts` — 40-tile board + `tileArea()` grid map + `isBuyable()`.
+- `src/components/` — `LeftPanel` (share/chat), `Board` (+`Dice`, tiles, buy prompt), `RightPanel` (players/Bankrupt/Trades/My properties), `Lobby` (appearance picker + settings).
+- Current game logic (done): join, roll → move + pass-START +$200, rent 20% of price, buy/skip, bankrupt, chat, trades create/cancel.
+- Later: step-by-step token animation, Surprise/Treasure decks, jail, tax rules, auctions, mortgage (P2–P4).
 
 **Core types:**
 ```ts
@@ -78,8 +89,9 @@ Event = { type: 'roll|move|buy|rent|card|join|leave|chat', text, at }
 - Acceptance: Lighthouse ≥90 on desktop, no horizontal scroll at 1280px, keyboard can roll/buy/end-turn.
 
 ## 5. File Plan
-- Now: `index.html` (demo), `README.md`, `PLAN.md` (this), `images/` (references).
-- Later: `src/tiles.ts`, `src/game.ts`, `src/ui/*.ts`, `tests/game.test.ts` (movement, rent, jail, cards). Keep `index.html` as demo until Vite cutover.
+- App: `index.html` (Vite entry), `src/`, `capacitor.config.ts`, `tailwind/postcss/vite/ts` configs.
+- Docs: `README.md`, `PLAN.md` (this). References: `images/`, `legacy/index.html`.
+- Later: `src/game/decks.ts`, `src/game/engine.ts` (pure rules + tests `tests/game.test.ts`), `src/components/TradeModal.tsx`, `ios/`/`android/` (generated, gitignored).
 
 ## 6. Milestones (repo-level)
 - **M1 repo + docs** (this commit): git init, GitHub `Rajniti`, `README.md`, `PLAN.md`, working `index.html` demo.

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RICHUP.io — Game</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#0b0a14;color:#e8e6ff;-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:#34315c;border-radius:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  .panel{background:#1a1830;border:1px solid #2b2850;border-radius:12px}
+  .muted{color:#8f8aa8}
+  .logo{font-weight:900;letter-spacing:.5px;font-size:34px;line-height:1}
+  .logo span{color:#a5a0e8}.logo em{color:#5b568f;font-style:normal;font-size:24px}
+
+  /* BOARD */
+  .board-wrap{background:#121022;border:1px solid #26234a;border-radius:14px;padding:8px;height:100%;display:flex;flex-direction:column}
+  .board{flex:1;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:6px;min-height:0;position:relative}
+  .board-center{grid-area:2/2/11/11;background:radial-gradient(ellipse at 50% 30%,#171434 0%,#0e0c1e 65%);border-radius:12px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:18px 12px;overflow:hidden}
+
+  .tile{background:#25224a;border:1px solid #34315e;border-radius:9px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 3px;min-width:0;min-height:0;overflow:hidden;text-align:center;cursor:pointer;transition:transform .12s,border-color .12s}
+  .tile:hover{transform:translateY(-1px);border-color:#5b56a0}
+  .tile .t-name{font-size:11px;font-weight:600;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .tile .t-price{font-size:10px;font-weight:700;background:rgba(255,255,255,.14);border-radius:5px;padding:1px 7px;margin-top:4px;color:#d9d6f5}
+  .tile .t-top{position:absolute;top:0;left:0;right:0;height:9px;border-radius:9px 9px 0 0}
+  .tile.side{flex-direction:row;justify-content:flex-start;gap:6px;padding:4px 8px 4px 4px;text-align:left}
+  .tile.side .t-name{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;letter-spacing:.2px}
+  .tile.side.right .t-name{transform:rotate(0deg);writing-mode:vertical-rl}
+  .tile.side .t-price{margin:0 0 0 auto;writing-mode:horizontal-tb}
+  .tile.side .t-side-bar{width:9px;align-self:stretch;border-radius:6px;flex-shrink:0}
+  .tile.special{background:#28244f}
+  .tile.corner{background:#1e1c3d}
+  .tile .t-icon{font-size:22px;line-height:1}
+  .tile .t-sub{font-size:9px;color:#8f8aa8;font-weight:600}
+  .tile .t-big{font-size:13px;font-weight:800}
+  .tile .flag{position:absolute;width:22px;height:22px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;background:#0b0a14;border:1px solid #ffffff33;z-index:3}
+  .top-tile .flag{bottom:-8px;right:2px}
+  .side .flag{top:50%;transform:translateY(-50%)}
+  .side.left .flag{right:-8px}
+  .side.right .flag{left:-8px}
+  .bottom-tile .flag{top:-8px;right:2px}
+
+  .owned-GREEN{box-shadow:inset 0 0 0 2px #7dff5e55}
+  .owned-purple{box-shadow:inset 0 0 0 2px #8b7cf655}
+  .owned-brown{box-shadow:inset 0 0 0 2px #c98a5b55}
+
+  .token-dot{position:absolute;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;z-index:4;border:2px solid rgba(0,0,0,.5);box-shadow:0 2px 8px rgba(0,0,0,.5)}
+  .token-dot .eyes{position:relative}
+  /* blob tokens */
+  .tk-green{background:#5be13c}.tk-brown{background:#8a5a3b}.tk-purple{background:#7b5cf0}
+
+  /* dice */
+  .dice{width:92px;height:92px;background:linear-gradient(145deg,#fff,#d9d6e8);border-radius:20px;position:relative;box-shadow:0 12px 32px rgba(0,0,0,.6),inset 0 2px 4px #fff;transform:rotate(-8deg)}
+  .dice.d2{transform:rotate(10deg)}
+  .pip{position:absolute;width:14px;height:14px;background:#1a1830;border-radius:50%}
+  @keyframes shake{0%,100%{transform:rotate(-8deg) translateY(0)}25%{transform:rotate(8deg) translateY(-14px)}50%{transform:rotate(-12deg) translateY(0)}75%{transform:rotate(6deg) translateY(-8px)}}
+  .rolling{animation:shake .5s ease infinite}
+
+  .log{font-size:12.5px;line-height:1.9;text-align:center;color:#b9b4d6}
+  .log b{color:#fff}
+  .card-pop{border-radius:12px;padding:12px 16px;font-weight:700;font-size:14px;line-height:1.3;max-width:230px;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative}
+  .card-pop button{position:absolute;top:4px;right:8px;background:none;border:none;color:#fff;opacity:.7;cursor:pointer;font-size:16px}
+
+  .chat-bubble{border-radius:8px;padding:6px 12px;font-size:13px;max-width:75%}
+  .btn{background:#2b2850;border:1px solid #3a3670;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;color:#e8e6ff;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .btn:hover{background:#34315e}
+  .btn-dark{background:#121022}
+  .player-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px}
+  .player-row.active{background:#25224a}
+  .avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+
+  @media (max-width:1100px){
+    body{overflow:auto;height:auto}
+    .app-grid{grid-template-columns:1fr !important;height:auto !important}
+    .board{aspect-ratio:1;min-height:640px}
+  }
+</style>
+</head>
+<body>
+
+<div class="app-grid" style="display:grid;grid-template-columns:300px 1fr 310px;gap:12px;padding:12px;height:100vh">
+
+  <!-- LEFT -->
+  <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+    <div>
+      <div class="logo">RICH<span>UP</span><em>.IO</em></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;color:#8f8aa8;font-size:16px;margin-top:2px">
+        <span title="Discord">🎮</span><span title="Help">ⓘ</span><span title="Sound">🔊</span>
+      </div>
+    </div>
+
+    <div class="panel" style="padding:14px">
+      <p style="text-align:center;color:#a5a0e8;font-weight:700;font-size:14px;margin-bottom:10px">Share this game ⓘ</p>
+      <div style="display:flex;gap:8px">
+        <div class="btn-dark btn" style="flex:1;font-weight:400;font-size:12px;overflow:hidden;white-space:nowrap">https://richup.io/room/vbcsp</div>
+        <button class="btn" onclick="navigator.clipboard&&navigator.clipboard.writeText('https://richup.io/room/vbcsp');this.textContent='✓ Copied';setTimeout(()=>this.innerHTML='⧉ Copy',1500)">⧉ Copy</button>
+      </div>
+      <button class="btn" style="width:100%;margin-top:8px;justify-content:center">⚙ View room settings</button>
+    </div>
+
+    <div style="border:1px dashed #3a3670;border-radius:10px;padding:8px;text-align:center;font-size:12px" class="muted">Disable your ad blocker to support Richup.io</div>
+
+    <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-bottom:1px solid #2b2850">
+        <span class="muted" style="font-size:13px">🔊 ✣</span>
+        <b style="color:#a5a0e8;font-size:14px">Chat</b>
+      </div>
+      <div id="chatList" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;justify-content:flex-end">
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div class="avatar tk-green">👀</div>
+          <div class="chat-bubble" style="background:#3b3670"><div style="font-size:10px;letter-spacing:2px;color:#a5a0e8">GREEN</div><div>Hi</div></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div class="avatar tk-brown">👀</div>
+          <div class="chat-bubble" style="background:#3b3670"><div style="font-size:10px;color:#c9a68a">Kazem</div><div>Hey</div></div>
+        </div>
+      </div>
+      <form id="chatForm" style="padding:12px;border-top:1px solid #2b2850;display:flex;gap:8px">
+        <input id="chatInput" placeholder="Only game players can send chat messages" style="flex:1;background:transparent;border:none;outline:none;color:#e8e6ff;font-size:12.5px;text-align:center">
+      </form>
+    </div>
+  </div>
+
+  <!-- CENTER BOARD -->
+  <div class="board-wrap">
+    <div class="board" id="board">
+      <div class="board-center">
+        <div style="display:flex;gap:28px;margin-top:26px;margin-bottom:10px">
+          <div class="dice" id="dice1"></div>
+          <div class="dice d2" id="dice2"></div>
+        </div>
+        <p id="turnLabel" style="font-size:14px;margin:14px 0"><span id="turnAvatar">🟤</span> <b id="turnName">Kazem</b> is playing...</p>
+        <button id="rollBtn" class="btn" style="background:#7dff5e;color:#0b0a14;border:none;font-weight:800;padding:10px 34px;font-size:15px;border-radius:10px;margin-bottom:8px">🎲 ROLL DICE</button>
+        <div class="log" id="gameLog" style="margin-top:6px;max-width:560px">
+          <div>🟢 G R E E N &nbsp;got a surprise card: From a scholarship you get $100.</div>
+          <div>🟢 G R E E N &nbsp;got a treasure card: Your phone died. Pay $50 for a repair.</div>
+          <div>🟣 miss my gf &nbsp;<b>bought</b> 📍 Tel Aviv</div>
+          <div>🟤 Kazem &nbsp;<b>bought</b> 🇮🇹 Venice</div>
+          <div>🟢 G R E E N &nbsp;<b>bought</b> ✈️ TLV Airport</div>
+          <div class="muted">Game started with a randomized players order. Good luck!</div>
+          <div class="muted">🟡 JAURA &nbsp;left the game</div>
+          <div class="muted">🟣 miss my gf &nbsp;joined the game</div>
+          <div class="muted">🟡 JAURA &nbsp;joined the game</div>
+          <div class="muted">🟤 Kazem &nbsp;joined the game</div>
+        </div>
+        <div style="position:absolute;right:18px;top:38%;display:flex;flex-direction:column;gap:12px;align-items:flex-end">
+          <div class="card-pop" id="card1" style="background:linear-gradient(135deg,#ff9f1c,#e05e00)">Your phone died.<br>Pay $50 for a<br>repair.<button onclick="document.getElementById('card1').remove()">×</button></div>
+          <div class="card-pop" id="card2" style="background:linear-gradient(135deg,#7b5cf0,#3b82f6)">From a<br>scholarship you<br>get $100.<button onclick="document.getElementById('card2').remove()">×</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+    <div class="panel" style="padding:8px" id="playerPanel">
+      <div class="player-row active">
+        <div class="avatar tk-green">👀</div>
+        <div style="flex:1"><div style="font-size:12px;letter-spacing:3px">GREEN 👑</div></div>
+        <div style="text-align:right"><div style="color:#7dff5e;font-weight:800;font-size:13px">100</div><div style="font-size:13px">$2350</div></div>
+      </div>
+      <div class="player-row">
+        <div class="avatar tk-brown">👀</div>
+        <div style="flex:1;font-size:13px">Kazem</div>
+        <div style="font-size:13px">$2370</div>
+      </div>
+      <div class="player-row">
+        <div class="avatar tk-purple">👀</div>
+        <div style="flex:1;font-size:13px">miss my gf</div>
+        <div style="font-size:13px">$2400</div>
+      </div>
+    </div>
+    <div class="panel" style="padding:14px;text-align:center;color:#a5a0e8;font-weight:700;font-size:14px">Trades</div>
+    <div class="panel" style="padding:14px" id="actionPanel">
+      <p class="muted" style="font-size:12px;text-align:center;margin-bottom:8px">Click a property to buy / manage</p>
+      <div id="selectedInfo" style="font-size:13px;text-align:center;min-height:40px">Select a tile on the board</div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn" style="flex:1;justify-content:center;background:#7dff5e;color:#0b0a14;border:none" id="buyBtn">Buy</button>
+        <button class="btn" style="flex:1;justify-content:center" id="tradeBtn">Trade</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const players=[
+  {name:'GREEN',cls:'tk-green',emoji:'🟢',money:2350,pos:5},
+  {name:'Kazem',cls:'tk-brown',emoji:'🟤',money:2370,pos:11},
+  {name:'miss my gf',cls:'tk-purple',emoji:'🟣',money:2400,pos:6},
+];
+let current=1;
+
+// tile definitions in clockwise order (40)
+const T=[
+ {n:'START',icon:'▶▶',big:true,color:'#7dff5e',type:'corner'},
+ {n:'Salvador',p:'60$',f:'🇧🇷',c:'#7dff5e'},
+ {n:'Treasure',icon:'🧰',sub:'Treasure',c:'#ff9f1c',type:'special'},
+ {n:'Rio',p:'60$',f:'🇧🇷',c:'#7dff5e'},
+ {n:'Earnings Tax',sub:'$¾ %10',icon:'💵',type:'special'},
+ {n:'TLV Airport',icon:'✈️',type:'special',owned:'GREEN'},
+ {n:'Tel Aviv',icon:'🟣',c:'#8b7cf0',owned:'miss my gf'},
+ {n:'Haifa',p:'110$',f:'🇮🇱',c:'#8b7cf0'},
+ {n:'Surprise',icon:'❓',sub:'Surprise',c:'#ff6b9d',type:'special'},
+ {n:'Jerusalem',p:'120$',f:'🇮🇱',c:'#8b7cf0'},
+ {n:'In Prison',sub:'Passing by / In Prison',icon:'🦓',type:'corner'},
+ // right side
+ {n:'Venice',f:'🇭🇺',owned:'Kazem',side:'right'},
+ {n:'Power Company',p:'150$',icon:'⚡',side:'right',type:'special'},
+ {n:'Milan',p:'140$',f:'🇭🇺',c:'#ff5b5b',side:'right'},
+ {n:'Rome',p:'160$',f:'🇭🇺',c:'#ff5b5b',side:'right'},
+ {n:'MUJ Airport',p:'200$',icon:'✈️',side:'right',type:'special'},
+ {n:'Frankfurt',p:'180$',f:'🇩🇪',c:'#ffb01c',side:'right'},
+ {n:'Treasure',icon:'🧰',sub:'Treasure',side:'right',type:'special'},
+ {n:'Munich',p:'190$',f:'🇩🇪',c:'#ffb01c',side:'right'},
+ {n:'Berlin',p:'200$',f:'🇩🇪',c:'#ffb01c',side:'right'},
+ {n:'Vacation',sub:'$50 on hold',icon:'🏝️',type:'corner'},
+ // bottom (right->left)
+ {n:'Shenzhen',p:'210$',f:'🇨🇳'},
+ {n:'Surprise',icon:'❓',sub:'Surprise',c:'#ff6b9d',type:'special'},
+ {n:'Beijing',p:'220$',f:'🇨🇳',c:'#ff5b5b'},
+ {n:'Shanghai',p:'240$',f:'⭐',c:'#ff5b5b'},
+ {n:'CDG Airport',p:'200$',icon:'✈️',type:'special'},
+ {n:'Lyon',p:'260$',f:'🇫🇷',c:'#3b82f6'},
+ {n:'Water Company',p:'150$',icon:'🚰',type:'special'},
+ {n:'Toulouse',p:'270$',f:'🇫🇷',c:'#3b82f6'},
+ {n:'Paris',p:'280$',f:'🇫🇷',c:'#3b82f6'},
+ {n:'Go to prison',icon:'☠️',type:'corner'},
+ // left side (bottom->top)
+ {n:'Liverpool',p:'290$',f:'🇬🇧',c:'#3b82f6',side:'left'},
+ {n:'Manchester',p:'300$',f:'🇬🇧',c:'#3b82f6',side:'left'},
+ {n:'Treasure',icon:'🧰',sub:'Treasure',side:'left',type:'special'},
+ {n:'London',p:'320$',f:'🇬🇧',c:'#3b82f6',side:'left'},
+ {n:'JFK Airport',p:'200$',icon:'✈️',side:'left',type:'special'},
+ {n:'Surprise',icon:'❓',sub:'Surprise',side:'left',type:'special'},
+ {n:'San Francisco',p:'360$',f:'🇺🇸',c:'#22c55e',side:'left'},
+ {n:'Premium Tax',p:'$75',icon:'🧭',side:'left',type:'special'},
+ {n:'New York',p:'400$',f:'🇺🇸',c:'#22c55e',side:'left'},
+];
+
+const board=document.getElementById('board');
+function tileHTML(t,i){
+  const isTop=i<=10, isBottom=i>=20&&i<=30, isSide=!!t.side;
+  const cls=isSide?('tile side '+t.side):(isTop||isBottom?'tile top-tile bottom-tile':'tile');
+  const bar=t.c? (isSide? `<div class="t-side-bar" style="background:${t.c}"></div>` : `<div class="t-top" style="background:${t.c}"></div>`):'';
+  let inner='';
+  if(t.n==='START') inner=`<div class="t-big" style="color:#7dff5e">START</div><div class="t-icon">▶▶</div>`;
+  else if(t.type==='corner'&&t.icon) inner=`<div class="t-icon">${t.icon}</div><div class="t-name">${t.n}</div>${t.sub?`<div class="t-sub">${t.sub}</div>`:''}${t.p?`<div class="t-price">${t.p}</div>`:''}`;
+  else if(t.type==='special'&&!t.p) inner=`<div class="t-sub" style="color:#ff9f1c">${t.n}</div><div class="t-icon">${t.icon||''}</div>${t.sub&&t.n!==t.sub?`<div class="t-sub">${t.sub}</div>`:''}`;
+  else inner=`${t.icon?`<div class="t-icon">${t.icon}</div>`:''}<div class="t-name">${t.n}</div>${t.p?`<div class="t-price">${t.p}</div>`:''}`;
+  const flag=t.f?`<div class="flag">${t.f}</div>`:'';
+  // grid position
+  let area='';
+  if(i<=10) area=`grid-area:1/${i+1}/2/${i+2}`;
+  else if(i<=19) area=`grid-area:${i-10+1}/11/${i-10+2}/12`;
+  else if(i===20) area=`grid-area:11/11/12/12`;
+  else if(i<=29) area=`grid-area:11/${11-(i-20)}/${12}/${11-(i-20)+1}`;
+  else if(i===30) area=`grid-area:11/1/12/2`;
+  else area=`grid-area:${11-(i-30)}/1/${11-(i-30)+1}/2`;
+  return `<div class="${cls}" data-i="${i}" style="${area}" title="${t.n}">${bar}${inner}${flag}<div class="tokens" id="tok-${i}" style="position:absolute;inset:0;pointer-events:none"></div></div>`;
+}
+board.insertAdjacentHTML('afterbegin',T.map(tileHTML).join(''));
+
+function renderTokens(){
+  document.querySelectorAll('.tokens').forEach(el=>el.innerHTML='');
+  players.forEach((p,pi)=>{
+    const c=document.getElementById('tok-'+p.pos);
+    if(!c) return;
+    const d=document.createElement('div');
+    d.className='token-dot '+p.cls;
+    d.style.left=(8+pi*20)+'px'; d.style.top='8px';
+    d.textContent='👀';
+    c.appendChild(d);
+  });
+}
+renderTokens();
+
+const pipLayouts={1:[[50,50]],2:[[28,28],[72,72]],3:[[28,28],[50,50],[72,72]],4:[[30,30],[70,30],[30,70],[70,70]],5:[[30,30],[70,30],[50,50],[30,70],[70,70]],6:[[30,28],[70,28],[30,50],[70,50],[30,72],[70,72]]};
+function drawDice(el,v){
+  el.innerHTML=pipLayouts[v].map(([x,y])=>`<div class="pip" style="left:calc(${x}% - 7px);top:calc(${y}% - 7px)"></div>`).join('');
+}
+drawDice(document.getElementById('dice1'),5);
+drawDice(document.getElementById('dice2'),2);
+
+function log(msg){const l=document.getElementById('gameLog');const d=document.createElement('div');d.innerHTML=msg;l.prepend(d);}
+document.getElementById('rollBtn').onclick=()=>{
+  const d1=document.getElementById('dice1'),d2=document.getElementById('dice2');
+  d1.classList.add('rolling');d2.classList.add('rolling');
+  setTimeout(()=>{
+    const v1=1+Math.floor(Math.random()*6),v2=1+Math.floor(Math.random()*6);
+    drawDice(d1,v1);drawDice(d2,v2);
+    d1.classList.remove('rolling');d2.classList.remove('rolling');
+    const p=players[current];
+    p.pos=(p.pos+v1+v2)%40;
+    renderTokens();
+    log(`${p.emoji} ${p.name} rolled ${v1}+${v2} → <b>${T[p.pos].n}</b>`);
+    current=(current+1)%players.length;
+    document.getElementById('turnName').textContent=players[current].name;
+  },700);
+};
+
+document.querySelectorAll('.tile').forEach(el=>{
+  el.onclick=()=>{
+    const t=T[+el.dataset.i];
+    document.getElementById('selectedInfo').innerHTML=`<b>${t.icon||'📍'} ${t.n}</b>${t.p?` — <span style="color:#7dff5e">${t.p}</span>`:''}${t.owned?`<br><span class="muted">Owned by ${t.owned}</span>`:`<br><span class="muted">Unowned</span>`}`;
+  };
+});
+document.getElementById('buyBtn').onclick=()=>log(`🟤 Kazem <b>bought</b> ${document.getElementById('selectedInfo').textContent.slice(0,30)}`);
+document.getElementById('tradeBtn').onclick=()=>alert('Trade window would open here');
+
+document.getElementById('chatForm').onsubmit=e=>{
+  e.preventDefault();
+  const inp=document.getElementById('chatInput');
+  if(!inp.value.trim())return;
+  const list=document.getElementById('chatList');
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;gap:8px;align-items:flex-end';
+  row.innerHTML=`<div class="avatar tk-brown">👀</div><div class="chat-bubble" style="background:#3b3670"><div style="font-size:10px;color:#c9a68a">Kazem</div><div></div></div>`;
+  row.querySelector('div div:last-child').textContent=inp.value;
+  list.appendChild(row);inp.value='';
+  list.scrollTop=list.scrollHeight;
+};
+</script>
+</body>
+</html>
