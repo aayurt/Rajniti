@@ -2,6 +2,14 @@
 
 > Project: **Rajniti** (github: `Rajniti`). A RichUp.io-style multiplayer Monopoly game.
 > Prime UI source of truth: **`images/`** — `images/game/` (active game room), `images/settings/` (lobby: appearance picker + game settings + gameplay rules).
+> Deep UI source: **`samples/`** (saved RichUp.io pages). Text inventory extracted 2026-10-06:
+> board is canvas-rendered on the real site (DOM grid is our reimplementation); shell/panels/chat/modals are DOM.
+> Authoritative copy: log lines (`{name} bought {tile}`, `{name} paid $N to {owner}`, `{name} paid a $N tax`,
+> `{name} will spend a turn while on vacation`, joins, `Game started with a randomized players order. Good luck!`,
+> `Joined room xxxxx`); turn area (`{name} is playing...` + `m:ss` timer + `Roll the dice`/`End turn` button);
+> `Host` badge (not crown); Copy/`Copied!` toggle; `Connection lost` banner; Adblock modal copy; lobby states
+> (room-full Spectate/Return, login-exclusive, `Waiting for {name} to start the game...`, `Updating settings...`);
+> starting cash options $500–$3000; airport is **MUC Airport** $200 (not MUJ).
 > `legacy/index.html` is the original single-file demo (reference only). Ignore `sketches/` for styling.
 
 ## 0. Stack decision (locked)
