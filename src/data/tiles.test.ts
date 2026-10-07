@@ -38,4 +38,55 @@ describe('tiles', () => {
     expect(isBuyable(TILES[8])).toBe(false); // Surprise
     expect(isBuyable(TILES[4])).toBe(false); // Tax
   });
+
+  it('matches all 40 tiles order, names and prices exactly against ground truth', () => {
+    const expected = [
+      { name: 'START' },
+      { name: 'Salvador', price: 60 },
+      { name: 'Treasure' },
+      { name: 'Rio', price: 60 },
+      { name: 'Earnings Tax' }, // prompt specifies sub %10, no price
+      { name: 'TLV Airport', price: 200 },
+      { name: 'Tel Aviv', price: 100 },
+      { name: 'Haifa', price: 110 },
+      { name: 'Surprise' },
+      { name: 'Jerusalem', price: 120 },
+      { name: 'In Prison' }, // Prompt mentioned 'Passing by/In Prison'
+      { name: 'Venice', price: 130 },
+      { name: 'Power Company', price: 150 },
+      { name: 'Milan', price: 140 },
+      { name: 'Rome', price: 160 },
+      { name: 'MUC Airport', price: 200 },
+      { name: 'Frankfurt', price: 180 },
+      { name: 'Treasure' },
+      { name: 'Munich', price: 190 },
+      { name: 'Berlin', price: 200 },
+      { name: 'Vacation' },
+      { name: 'Shenzhen', price: 210 },
+      { name: 'Surprise' },
+      { name: 'Beijing', price: 220 },
+      { name: 'Shanghai', price: 240 },
+      { name: 'CDG Airport', price: 200 },
+      { name: 'Lyon', price: 260 },
+      { name: 'Water Company', price: 150 },
+      { name: 'Toulouse', price: 270 },
+      { name: 'Paris', price: 280 },
+      { name: 'Go to prison' },
+      { name: 'Liverpool', price: 290 },
+      { name: 'Manchester', price: 300 },
+      { name: 'Treasure' },
+      { name: 'London', price: 320 },
+      { name: 'JFK Airport', price: 200 },
+      { name: 'Surprise' },
+      { name: 'San Francisco', price: 360 },
+      { name: 'Premium Tax', price: 75 },
+      { name: 'New York', price: 400 },
+    ];
+    for (let i = 0; i < 40; i++) {
+      expect(TILES[i].name).toBe(expected[i].name);
+      if (expected[i].price !== undefined) {
+        expect(TILES[i].price).toBe(expected[i].price);
+      }
+    }
+  });
 });

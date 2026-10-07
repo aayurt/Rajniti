@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useReducer } from 'react';
 import type { ReactNode } from 'react';
 import { TILES, isBuyable } from '../data/tiles';
+import { createTurn, tickTurn, rollTurn, endTurn, TurnState } from './turn';
 import { applyMove, buyTile, applyRent, advanceTurn, eliminateIfBankrupt, GameState } from './engine';
 
 export interface Player {
@@ -53,6 +54,7 @@ interface State {
   startingCash: number;
   rules: Record<string, boolean>;
   mobileTab: MobileTab;
+  turn: TurnState;
 }
 
 type Action =
@@ -72,7 +74,9 @@ type Action =
   | { type: 'SET_MAX_PLAYERS'; n: number }
   | { type: 'SET_STARTING_CASH'; n: number }
   | { type: 'TOGGLE_RULE'; key: string }
-  | { type: 'SET_TAB'; tab: MobileTab };
+  | { type: 'SET_TAB'; tab: MobileTab }
+  | { type: 'END_TURN' }
+  | { type: 'TICK_TURN' };
 
 let uid = 1;
 const nid = () => uid++;
@@ -111,6 +115,7 @@ export const initialState: State = {
     randomOrder: true,
   },
   mobileTab: 'board',
+  turn: createTurn(),
 };
 
 function joinLog(startingCash: number): LogEntry[] {
@@ -153,13 +158,14 @@ export function reducer(s: State, a: Action): State {
         chat: [],
         log: joinLog(s.startingCash),
         mobileTab: 'board',
+        turn: createTurn(),
       };
     }
     case 'BACK_TO_LOBBY':
       return { ...s, screen: 'lobby' };
     case 'ROLL':
-      if (s.rolling) return s;
-      return { ...s, rolling: true, dice: [a.d1, a.d2], pendingBuy: null };
+      if (s.rolling || s.turn.phase !== 'awaitRoll') return s;
+      return { ...s, rolling: true, dice: [a.d1, a.d2], pendingBuy: null, turn: rollTurn(s.turn) };
     case 'LANDED': {
       const moverIndex = s.current;
       const p = s.players[moverIndex];
@@ -204,7 +210,17 @@ export function reducer(s: State, a: Action): State {
         }
       }
 
-      advanceTurn(engineState);
+      if (tile.kind === 'tax') {
+        const amount = tile.name === 'Earnings Tax' ? Math.round(p.cash * 0.1) : 75;
+        engineState.players[engineState.current].cash -= amount;
+        log.push({ id: nid(), text: `${p.name} paid a $${amount} tax` });
+      }
+
+      if (tile.kind === 'vacation') {
+        log.push({ id: nid(), text: `${p.name} will spend a turn while on vacation` });
+      }
+
+      // advanceTurn(engineState);
 
       const updatedPlayers = s.players.map((pl, i) => ({
         ...pl,
@@ -270,7 +286,7 @@ export function reducer(s: State, a: Action): State {
         players: updatedPlayers,
         owned: { ...s.owned, [tileId]: s.players[s.lastMover].id },
         pendingBuy: null,
-        log: [...s.log, { id: nid(), text: `${s.players[s.lastMover].name} bought ${tile.name} for $${tile.price}` }],
+        log: [...s.log, { id: nid(), text: `${s.players[s.lastMover].name} bought ${tile.name}` }],
       };
     }
     case 'SKIP_BUY':
@@ -326,6 +342,24 @@ export function reducer(s: State, a: Action): State {
       return { ...s, rules: { ...s.rules, [a.key]: !s.rules[a.key] } };
     case 'SET_TAB':
       return { ...s, mobileTab: a.tab };
+    case 'TICK_TURN':
+      return { ...s, turn: tickTurn(s.turn) };
+    case 'END_TURN': {
+      const engineState: GameState = {
+        players: s.players.map(pl => ({ name: pl.name, cash: pl.cash, pos: pl.pos, out: !!pl.isOut })),
+        current: s.current,
+        owners: {},
+      };
+      for (const pos in s.owned) {
+        const ownerId = s.owned[pos];
+        const idx = s.players.findIndex(pl => pl.id === ownerId);
+        if (idx !== -1) {
+          engineState.owners[pos] = idx;
+        }
+      }
+      advanceTurn(engineState);
+      return { ...s, current: engineState.current, turn: createTurn(), pendingBuy: null };
+    }
     default:
       return s;
   }

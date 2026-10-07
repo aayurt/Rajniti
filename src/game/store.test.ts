@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { reducer, initialState } from './store';
 
 describe('Store Reducer', () => {
-  it('ROLL then LANDED moves token and advances turn', () => {
+  it('ROLL then LANDED moves token and wait for end turn', () => {
     // 1. Initial state has current player 0 at pos 0
     let state = reducer(initialState, { type: 'JOIN_GAME' });
     expect(state.current).toBe(0);
@@ -18,9 +18,13 @@ describe('Store Reducer', () => {
 
     // 4. Assert: moves token
     expect(state.players[0].pos).toBe(7); // 3+4 = 7
-    // advances turn
-    expect(state.current).toBe(1);
+    // Does NOT advance turn immediately anymore
+    expect(state.current).toBe(0);
     expect(state.lastMover).toBe(0);
+
+    // 5. End turn
+    state = reducer(state, { type: 'END_TURN' });
+    expect(state.current).toBe(1);
   });
 
   it('BUY assigns owner and deducts cash', () => {

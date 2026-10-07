@@ -40,7 +40,7 @@ export const TILES: Tile[] = [
   { id: 12, name: 'Power Company', price: 150, icon: '⚡', kind: 'utility', side: 'right' },
   { id: 13, name: 'Milan', price: 140, flag: '🇭🇺', color: '#ff5b5b', kind: 'property', side: 'right' },
   { id: 14, name: 'Rome', price: 160, flag: '🇭🇺', color: '#ff5b5b', kind: 'property', side: 'right' },
-  { id: 15, name: 'MUJ Airport', price: 200, icon: '✈️', kind: 'airport', side: 'right' },
+  { id: 15, name: 'MUC Airport', price: 200, icon: '✈️', kind: 'airport', side: 'right' },
   { id: 16, name: 'Frankfurt', price: 180, flag: '🇩🇪', color: '#ffb01c', kind: 'property', side: 'right' },
   { id: 17, name: 'Treasure', icon: '🧰', sub: 'Treasure', kind: 'treasure', side: 'right' },
   { id: 18, name: 'Munich', price: 190, flag: '🇩🇪', color: '#ffb01c', kind: 'property', side: 'right' },

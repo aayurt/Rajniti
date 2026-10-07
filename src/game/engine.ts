@@ -79,7 +79,7 @@ export function buyTile(state: GameState, tileId: number): GameEvent[] {
   }
   player.cash -= price;
   state.owners[tileId] = state.current;
-  return [{ type: 'buy', message: `${player.name} bought ${tile.name} for $${price}`, player: state.current, tileId, amount: price }];
+  return [{ type: 'buy', message: `${player.name} bought ${tile.name}`, player: state.current, tileId, amount: price }];
 }
 
 export function applyRent(state: GameState, tileId: number): GameEvent[] {
@@ -91,7 +91,7 @@ export function applyRent(state: GameState, tileId: number): GameEvent[] {
   const tenant = state.players[state.current];
   tenant.cash -= rent;
   state.players[owner].cash += rent;
-  return [{ type: 'rent', message: `${tenant.name} paid $${rent} rent to ${state.players[owner].name}`, player: state.current, tileId, amount: rent }];
+  return [{ type: 'rent', message: `${tenant.name} paid $${rent} to ${state.players[owner].name}`, player: state.current, tileId, amount: rent }];
 }
 
 export function eliminateIfBankrupt(state: GameState, playerIndex: number): GameEvent[] {

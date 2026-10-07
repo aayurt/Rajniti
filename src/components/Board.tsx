@@ -76,6 +76,14 @@ export default function Board({ blurred = false, interactive = true }: { blurred
     if (timer.current) window.clearTimeout(timer.current);
   }, []);
 
+  useEffect(() => {
+    if (!interactive || blurred) return;
+    const interval = setInterval(() => {
+      dispatch({ type: 'TICK_TURN' });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [interactive, blurred, dispatch]);
+
   const roll = () => {
     if (state.rolling || blurred || !interactive) return;
     const d1 = 1 + Math.floor(Math.random() * 6);
@@ -123,22 +131,36 @@ export default function Board({ blurred = false, interactive = true }: { blurred
 
           {!blurred && (
             <>
-              <p className="text-sm my-3.5">
+              <p className="text-sm my-3.5 flex items-center gap-2">
                 <span
                   className="inline-block w-4 h-4 rounded-full text-[10px] text-center mr-1"
                   style={{ background: currentPlayer.color }}
                 >
                   👀
                 </span>{' '}
-                <b>{currentPlayer.name}</b> <span className="text-fog">is playing...</span>
+                <span><b>{currentPlayer.name}</b> <span className="text-fog">is playing...</span></span>
+                <span className="text-fog font-mono ml-2">
+                  {Math.floor(state.turn.timeLeft / 60).toString().padStart(2, '0')}:
+                  {(state.turn.timeLeft % 60).toString().padStart(2, '0')}
+                </span>
               </p>
-              <button
-                onClick={roll}
-                disabled={state.rolling}
-                className="bg-lime text-ink font-extrabold rounded-[10px] px-8 py-2.5 text-[15px] mb-2 min-h-[48px] disabled:opacity-60"
-              >
-                🎲 {state.rolling ? 'ROLLING...' : 'ROLL DICE'}
-              </button>
+              {state.turn.phase === 'awaitRoll' ? (
+                <button
+                  onClick={roll}
+                  disabled={state.rolling}
+                  className="bg-lime text-ink font-extrabold rounded-[10px] px-8 py-2.5 text-[15px] mb-2 min-h-[48px] disabled:opacity-60"
+                >
+                  Roll the dice
+                </button>
+              ) : (
+                <button
+                  onClick={() => dispatch({ type: 'END_TURN' })}
+                  disabled={state.rolling}
+                  className="bg-rose text-ink font-extrabold rounded-[10px] px-8 py-2.5 text-[15px] mb-2 min-h-[48px] disabled:opacity-60"
+                >
+                  End turn
+                </button>
+              )}
 
               {pendingTile && isBuyable(pendingTile) && (
                 <div className="bg-panel border border-lime rounded-xl px-5 py-3 text-center text-sm mb-2">
