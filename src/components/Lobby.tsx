@@ -46,7 +46,7 @@ export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' |
       </div>
 
       {/* center: blurred board + appearance picker */}
-      <div className="relative min-h-0 h-[52dvh] lg:h-auto">
+      <div className="relative min-h-0 lg:h-[100dvh] flex flex-col justify-center">
         <Board blurred interactive={false} />
 
         {roomState === 'full' && (
@@ -74,34 +74,36 @@ export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' |
 
         {roomState === 'normal' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/45 rounded-[14px] p-4 overflow-y-auto">
-            <p className="text-sm mb-5">{LOBBY_COPY.appearancePicker}</p>
-            <div className="grid grid-cols-4 gap-x-7 gap-y-4 mb-7">
-              {APPEARANCES.map((c) => {
-                const active = state.appearance === c;
-                return (
-                  <button
-                    key={c}
-                    onClick={() => dispatch({ type: 'SET_APPEARANCE', color: c })}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl min-w-[48px] min-h-[48px] ${
-                      active ? 'ring-4 ring-white/70 scale-110' : ''
-                    }`}
-                    style={{ background: c }}
-                    aria-label={`Appearance ${c}`}
-                  >
-                    {active && '👀'}
-                  </button>
-                );
-              })}
+            <div className="flex flex-col items-center justify-center max-h-full my-auto w-full">
+              <p className="text-sm mb-3">{LOBBY_COPY.appearancePicker}</p>
+              <div className="grid grid-cols-4 gap-x-4 gap-y-2 mb-4">
+                {APPEARANCES.map((c) => {
+                  const active = state.appearance === c;
+                  return (
+                    <button
+                      key={c}
+                      onClick={() => dispatch({ type: 'SET_APPEARANCE', color: c })}
+                      className={`w-12 h-12 rounded-full flex items-center justify-center text-xl min-w-[48px] min-h-[48px] ${
+                        active ? 'ring-4 ring-white/70 scale-110' : ''
+                      }`}
+                      style={{ background: c }}
+                      aria-label={`Appearance ${c}`}
+                    >
+                      {active && '👀'}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                onClick={() => dispatch({ type: 'JOIN_GAME' })}
+                className="bg-[#5b34e8] text-white font-semibold rounded-md px-7 py-3 text-[15px] min-h-[48px]"
+              >
+                {LOBBY_COPY.joinGame} →
+              </button>
+              <button className="mt-4 border border-line rounded-lg px-4 py-2 text-[13px] text-fog min-h-[44px]">
+                🛒 {LOBBY_COPY.getMoreAppearances}
+              </button>
             </div>
-            <button
-              onClick={() => dispatch({ type: 'JOIN_GAME' })}
-              className="bg-[#5b34e8] text-white font-semibold rounded-md px-7 py-3 text-[15px] min-h-[48px]"
-            >
-              {LOBBY_COPY.joinGame} →
-            </button>
-            <button className="mt-8 border border-line rounded-lg px-4 py-2 text-[13px] text-fog min-h-[44px]">
-              🛒 {LOBBY_COPY.getMoreAppearances}
-            </button>
           </div>
         )}
       </div>
