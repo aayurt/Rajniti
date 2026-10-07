@@ -59,11 +59,23 @@ function TileView({ t, owned, tokens, selected, onSelect }: {
       {bar}
       {inner}
       {t.flag && <div className="flag">{t.flag}</div>}
-      {tokens.map((tk, i) => (
-        <div key={i} className="token-dot" style={{ background: tk.color, left: 6 + i * 18, bottom: 6 }}>
-          👀
+      {tokens.length > 0 && (
+        <div className="tokens-container absolute bottom-1 left-0 right-0 flex justify-center items-end px-1 pointer-events-none" >
+          {tokens.map((tk, i) => (
+            <div
+              key={i}
+              className="token-dot relative"
+              style={{
+                background: tk.color,
+                marginLeft: i > 0 ? '-8px' : '0',
+                zIndex: tokens.length - i
+              }}
+            >
+              👀
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }

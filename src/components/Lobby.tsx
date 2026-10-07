@@ -112,20 +112,6 @@ export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' |
           {LOBBY_COPY.waitingForHost(hostName)}
         </div>
 
-        <div className="bg-panel border border-edge rounded-xl p-4 flex flex-col gap-2">
-          {state.players.map(p => (
-            <div key={p.id} className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full" style={{ backgroundColor: p.color }} />
-              <div className="flex-1 font-semibold text-sm">{p.name}</div>
-              {p.isOwner && (
-                <span className="bg-line px-2 py-1 rounded text-xs text-lav font-semibold">
-                  Host
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-
         <div className="bg-panel border border-edge rounded-xl p-4">
           <b className="text-lav text-sm block text-center mb-3">Game settings</b>
 
