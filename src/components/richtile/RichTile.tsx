@@ -76,7 +76,13 @@ export default function RichTile({
     ...(groupColor
       ? {
           background: `radial-gradient(ellipse at 50% 50%, ${groupColor}24 0%, #171530 85%)`,
-          borderColor: `${groupColor}55`,
+          ...(orient === 'left'
+            ? { borderLeft: `3px solid ${groupColor}55`, borderTop: 'none', borderBottom: 'none', borderRight: 'none' }
+            : orient === 'right'
+            ? { borderRight: `3px solid ${groupColor}55`, borderTop: 'none', borderBottom: 'none', borderLeft: 'none' }
+            : orient === 'top'
+            ? { borderTop: `3px solid ${groupColor}55`, borderBottom: 'none', borderLeft: 'none', borderRight: 'none' }
+            : { borderBottom: `3px solid ${groupColor}55`, borderTop: 'none', borderLeft: 'none', borderRight: 'none' }),
         }
       : {}),
   };
@@ -113,12 +119,12 @@ export default function RichTile({
             position: 'absolute',
             zIndex: 1,
             ...(orient === 'bottom'
-              ? { bottom: 0, left: 0, right: 0, height: '5px', borderRadius: '0 0 0.5em 0.5em' }
+              ? { bottom: 0, top: 'auto', left: 0, right: 0, height: '5px', width: 'auto', borderRadius: '0 0 0.5em 0.5em' }
               : orient === 'top'
-              ? { top: 0, left: 0, right: 0, height: '5px', borderRadius: '0.5em 0.5em 0 0' }
+              ? { top: 0, bottom: 'auto', left: 0, right: 0, height: '5px', width: 'auto', borderRadius: '0.5em 0.5em 0 0' }
               : orient === 'left'
-              ? { top: 0, bottom: 0, left: 0, width: '5px', borderRadius: '0.5em 0 0 0.5em' }
-              : { top: 0, bottom: 0, right: 0, width: '5px', borderRadius: '0 0.5em 0.5em 0' }),
+              ? { top: 0, bottom: 0, left: 'auto', right: 0, width: '5px', height: '100%', borderRadius: '0 0.5em 0.5em 0' }
+              : { top: 0, bottom: 0, left: 'auto', right: 0, width: '5px', height: '100%', borderRadius: '0 0.5em 0.5em 0' }),
           }}
         />
       )}
