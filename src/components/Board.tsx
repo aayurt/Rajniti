@@ -22,6 +22,7 @@ function TileView({ t, ownedBy, tokens, selected, onSelect }: {
   selected: boolean;
   onSelect: () => void;
 }) {
+  const orient = orientFor(t.id);
   return (
     <RichTile
       index={t.id}
@@ -35,7 +36,7 @@ function TileView({ t, ownedBy, tokens, selected, onSelect }: {
       level={0}
       ownedBy={ownedBy}
       selected={selected}
-      orient={orientFor(t.id)}
+      orient={orient}
       onSelect={onSelect}
       style={{ gridArea: tileArea(t.id) }}
     >
@@ -49,7 +50,7 @@ function TileView({ t, ownedBy, tokens, selected, onSelect }: {
                 className="rich-token"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%`, zIndex: tokens.length - i }}
               >
-                <Character color={tk.color} flip={i % 2 === 1} />
+                <Character color={tk.color} flip={i % 2 === 1} orient={orient} />
               </div>
             );
           })}

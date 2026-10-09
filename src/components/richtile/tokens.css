@@ -585,3 +585,163 @@ body {
     scale: 1;
   }
 }
+/* Updates for new obfuscated classes from samples/tile-shanghai-reference.html */
+.D8mtfl-S {
+  position: relative;
+  background-color: rgb(38, 42, 76);
+  background-image: linear-gradient(to right bottom, rgb(38, 42, 76), rgb(47, 38, 76));
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1 0 0;
+  border-radius: 0.5em;
+  cursor: pointer;
+  padding: 0;
+  user-select: none;
+  overflow: hidden;
+}
+
+.richup-block-top {
+  flex-direction: column-reverse;
+}
+
+.richup-block-right, .richup-block-left {
+  writing-mode: vertical-rl;
+}
+
+.richup-block-right {
+  transform: rotate(0.04deg);
+}
+
+.richup-block-left {
+  transform: rotate(180.04deg);
+}
+
+.PuSPraNU {
+  display: flex;
+  gap: 2px;
+  min-height: 6px;
+  align-items: center;
+  z-index: 1;
+}
+
+.PuSPraNU [data-level-pip] {
+  width: 8px;
+  height: 5px;
+  border-radius: 2px;
+  background: #7dff5e;
+  display: inline-block;
+}
+
+.LelS5mxC {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.175;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.YqnDBpFw {
+  position: absolute;
+  inset: 0;
+  filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.YqnDBpFw svg {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+
+.CvalsVWS {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.mlnKELb2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -1rem;
+  margin-bottom: -1rem;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.mlnKELb2 svg {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  clip-path: circle(50% at 50% 50%);
+}
+
+.LSlmqo-l {
+  font-family: 'Yanone Kaffeesatz', 'Segoe UI', serif;
+  font-weight: 400;
+  font-size: 1.125em;
+  line-height: 0.75;
+  text-align: center;
+  align-self: stretch;
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+  overflow-wrap: break-word;
+  text-shadow: 0 0 0.5em #262a4c;
+  z-index: 1;
+}
+
+._0NRL5-w0 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1em;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.25em;
+  padding: 0.25rem 0.5rem;
+  margin: 0.25rem;
+  color: #fff;
+  z-index: 1;
+  max-width: 100%;
+}
+
+.YV19OnIY {
+  display: inline-flex;
+}
+
+.cprZ5bW8 {
+  display: inline-flex;
+  color: #7dff5e;
+}
+
+.richup-block-treasure {
+  background-image: linear-gradient(135deg, rgba(255, 159, 28, 0.25), rgba(214, 88, 10, 0.25)) !important;
+}
+
+.richup-block-surprise {
+  background-image: linear-gradient(135deg, rgba(255, 107, 157, 0.22), rgba(255, 107, 157, 0.12)) !important;
+}
+
+.richup-block-tax {
+  background-image: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.15)) !important;
+}
+
+/* Cleanup duplicate classes */

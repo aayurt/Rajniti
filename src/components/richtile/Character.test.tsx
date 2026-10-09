@@ -42,4 +42,15 @@ describe('Character', () => {
     const { container } = render(<Character color="#e5484d" selected />);
     expect(container.querySelector('[data-show-on-selected]')).not.toBeNull();
   });
+
+  it('rotates based on orient prop', () => {
+    const { container: topContainer } = render(<Character color="#e5484d" orient="top" />);
+    expect(topContainer.querySelector('span > span')?.getAttribute('style')).toContain('rotate(180deg)');
+
+    const { container: rightContainer } = render(<Character color="#e5484d" orient="right" />);
+    expect(rightContainer.querySelector('span > span')?.getAttribute('style')).toContain('rotate(-90deg)');
+
+    const { container: leftContainer } = render(<Character color="#e5484d" orient="left" />);
+    expect(leftContainer.querySelector('span > span')?.getAttribute('style')).toContain('rotate(90deg)');
+  });
 });
