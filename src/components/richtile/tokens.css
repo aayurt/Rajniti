@@ -604,7 +604,7 @@ body {
   cursor: pointer;
   padding: 0;
   user-select: none;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .richup-block-top {
@@ -626,7 +626,7 @@ body {
 .PuSPraNU {
   display: flex;
   gap: 2px;
-  min-height: 6px;
+  min-height: 0;
   align-items: center;
   z-index: 1;
 }
@@ -679,28 +679,26 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: -1rem;
-  margin-bottom: -1rem;
+  margin: 0;
   z-index: 1;
   flex-shrink: 0;
 }
 
 .mlnKELb2 svg {
-  width: 2rem;
-  height: 2rem;
+  width: 1.15rem;
+  height: 1.15rem;
   border-radius: 50%;
   clip-path: circle(50% at 50% 50%);
 }
 
 .LSlmqo-l {
   font-family: 'Yanone Kaffeesatz', 'Segoe UI', serif;
-  font-weight: 400;
-  font-size: 1.125em;
-  line-height: 0.75;
+  font-weight: 600;
+  font-size: 1.05em;
+  line-height: 1;
   text-align: center;
   align-self: stretch;
-  margin-top: 0.4rem;
-  margin-bottom: 0.4rem;
+  margin: 1px 0;
   overflow-wrap: break-word;
   text-shadow: 0 0 0.5em #262a4c;
   z-index: 1;
@@ -710,16 +708,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  font-size: 0.75em;
-  font-weight: 600;
-  line-height: 1em;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 0.25em;
-  padding: 0.25rem 0.5rem;
-  margin: 0.25rem;
+  gap: 2px;
+  font-size: 0.7em;
+  font-weight: 700;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin: 1px 0 2px 0;
   color: #fff;
-  z-index: 1;
+  z-index: 2;
   max-width: 100%;
 }
 

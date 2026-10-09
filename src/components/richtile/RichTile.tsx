@@ -71,6 +71,16 @@ export default function RichTile({
 
   const blockClass = `D8mtfl-S _1KW03nqs Itu-lOtn richup-block-${orient}${kind ? ` richup-block-${kind}` : ''}${selected ? ' selected' : ''} lGIw59Ly`;
 
+  const tileStyle: CSSProperties = {
+    ...style,
+    ...(groupColor
+      ? {
+          background: `radial-gradient(ellipse at 50% 50%, ${groupColor}24 0%, #171530 85%)`,
+          borderColor: `${groupColor}55`,
+        }
+      : {}),
+  };
+
   return (
     <div
       className={blockClass}
@@ -79,7 +89,7 @@ export default function RichTile({
       aria-expanded={expanded}
       title={name}
       onClick={onSelect}
-      style={style}
+      style={tileStyle}
     >
       <div className="PuSPraNU">
         {Array.from({ length: level }, (_, i) => (
@@ -95,7 +105,23 @@ export default function RichTile({
         </div>
       )}
 
-      {groupColor && <div className="rich-bar" style={{ background: groupColor, height: '6px', width: '100%', position: 'absolute', top: 0, left: 0 }} />}
+      {groupColor && (
+        <div
+          className="rich-bar"
+          style={{
+            background: groupColor,
+            position: 'absolute',
+            zIndex: 1,
+            ...(orient === 'bottom'
+              ? { bottom: 0, left: 0, right: 0, height: '5px', borderRadius: '0 0 0.5em 0.5em' }
+              : orient === 'top'
+              ? { top: 0, left: 0, right: 0, height: '5px', borderRadius: '0.5em 0.5em 0 0' }
+              : orient === 'left'
+              ? { top: 0, bottom: 0, left: 0, width: '5px', borderRadius: '0.5em 0 0 0.5em' }
+              : { top: 0, bottom: 0, right: 0, width: '5px', borderRadius: '0 0.5em 0.5em 0' }),
+          }}
+        />
+      )}
 
       <div className="CvalsVWS">
         {flag && (

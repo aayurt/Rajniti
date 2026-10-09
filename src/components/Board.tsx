@@ -91,10 +91,10 @@ export default function Board({ blurred = false, interactive = true }: { blurred
   const canAfford = pendingTile && me && pendingTile.price !== undefined && me.cash >= pendingTile.price;
 
   return (
-    <div className="aspect-square max-h-[calc(100dvh-24px)] max-w-full mx-auto flex flex-col min-h-0">
+    <div className="aspect-square max-h-[calc(100dvh-28px)] max-w-full mx-auto flex flex-col min-h-0 p-1">
       <div
         className="flex-1 grid min-h-0"
-        style={{ gridTemplateColumns: 'repeat(11, 1fr)', gridTemplateRows: 'repeat(11, 1fr)', gap: 6 }}
+        style={{ gridTemplateColumns: 'repeat(11, 1fr)', gridTemplateRows: 'repeat(11, 1fr)', gap: 4 }}
       >
         {TILES.map((t) => (
           <TileView
@@ -110,7 +110,7 @@ export default function Board({ blurred = false, interactive = true }: { blurred
         <div
           className="relative flex flex-col items-center justify-start px-3 overflow-hidden rounded-xl"
           style={{
-            gridArea: '2 / 2 / 12 / 11',
+            gridArea: '2 / 2 / 11 / 11',
             background: 'radial-gradient(ellipse at 50% 30%,#171434 0%,#0e0c1e 65%)',
             filter: blurred ? 'blur(6px)' : undefined,
             pointerEvents: blurred ? 'none' : undefined,
