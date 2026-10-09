@@ -44,10 +44,38 @@ describe('Lobby component states', () => {
     const waitingBars = screen.getAllByText(/Waiting for/);
     expect(waitingBars.length).toBeGreaterThan(0);
 
-    // Look for the specific div containing the player list.
-    // The player list has a div with player details, we shouldn't see it
     const hostBadges = container.querySelectorAll('span.bg-line');
-    // We expect 0 host badges inside player lists in the right column of Lobby
     expect(hostBadges.length).toBe(0);
+  });
+
+  it('exposes appearance picker 12-color grid', () => {
+    const { container } = render(
+      <GameProvider>
+        <Lobby roomState="normal" />
+      </GameProvider>
+    );
+    const colorButtons = container.querySelectorAll('.w-12.h-12.rounded-full');
+    expect(colorButtons.length).toBe(12);
+  });
+
+  it('exposes settings rows correctly', () => {
+    render(
+      <GameProvider>
+        <Lobby roomState="normal" />
+      </GameProvider>
+    );
+
+    expect(screen.getAllByText('Maximum players').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Private room').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Allow bots to join').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Board map').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('x2 rent on full-set properties').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Vacation cash').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Auction').length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Don't collect rent while in prison").length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Mortgage').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Even build').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Starting cash').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Randomize player order').length).toBeGreaterThan(0);
   });
 });

@@ -20,4 +20,16 @@ describe('Dice', () => {
     expect(diceDiv.style.width).toBe('80px');
     expect(diceDiv.style.height).toBe('80px');
   });
+
+  it('applies rolling class when rolling prop is true', () => {
+    const { container } = render(<Dice value={1} rolling={true} />);
+    const diceDiv = container.firstChild as HTMLElement;
+    expect(diceDiv.className).toContain('rolling');
+  });
+
+  it('renders correct number of pips for given value', () => {
+    const { container } = render(<Dice value={5} />);
+    const pips = container.querySelectorAll('.pip');
+    expect(pips.length).toBe(5);
+  });
 });
