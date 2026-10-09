@@ -126,22 +126,6 @@ export default function LeftPanel({ room = 'jfwq6' }: { room?: string }) {
         </form>
       </div>
 
-      {showAdblockModal && (
-        <div className="fixed bottom-4 left-4 z-50 p-4 pointer-events-none">
-          <div className="bg-panel border border-edge rounded-xl p-4 max-w-xs w-full relative shadow-lg pointer-events-auto">
-            <button
-              onClick={() => setShowAdblockModal(false)}
-              className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center text-fog bg-tile rounded-full text-xs"
-            >
-              ✕
-            </button>
-            <h3 className="text-lav font-bold text-[15px] mb-2 pr-6">{adblockCopy.modalTitle}</h3>
-            <p className="text-xs text-fog leading-relaxed">
-              {adblockCopy.modalBody}
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
+      </div>
   );
 }

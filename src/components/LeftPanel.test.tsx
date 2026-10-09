@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import LeftPanel from './LeftPanel';
 import { GameProvider } from '../game/store';
+import { adblockCopy } from './panels/copy';
 
 describe('LeftPanel component', () => {
   it('renders adblock as a small bottom-left toast without fullscreen backdrop', () => {
@@ -11,8 +12,8 @@ describe('LeftPanel component', () => {
       </GameProvider>
     );
 
-    // It should render the modal text
-    expect(screen.getByText(/Please disable your Adblocker/i)).toBeInTheDocument();
+    // It should render the inline adblock notice
+    expect(screen.getByText(new RegExp(adblockCopy.inline, 'i'))).toBeInTheDocument();
 
     // But it should NOT have a fixed inset-0 black background (fullscreen backdrop)
     const backdrop = container.querySelector('.fixed.inset-0.bg-black\\/60');
