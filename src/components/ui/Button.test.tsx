@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Button } from './Button';
 
 describe('Button', () => {
   it('renders children', () => {
-    const { base } = render(<Button>Click me</Button>);
-    expect(base.textContent).toContain('Click me');
+    const { container } = render(<Button>Click me</Button>);
+    expect(container.textContent).toContain('Click me');
   });
 
   it('applies base classes', () => {
@@ -32,8 +32,8 @@ describe('Button', () => {
   });
 
   it('supports onClick', () => {
-    const handleClick = jest.fn();
-    render(<Button onClick={handleClick}>Click</Button>);
+    const handleClick = vi.fn();
+    const { container } = render(<Button onClick={handleClick}>Click</Button>);
     const button = container.querySelector('button');
     button?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(handleClick).toHaveBeenCalledTimes(1);

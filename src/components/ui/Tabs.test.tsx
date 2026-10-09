@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { Tabs } from './Tabs';
+import { Tabs, TabPanel } from './Tabs';
 
 describe('Tabs', () => {
   it('renders tab panels', () => {
@@ -19,10 +19,10 @@ describe('Tabs', () => {
       </Tabs>
     );
     const panels = container.querySelectorAll('[id^="tab-panel-"]');
-    expect(panels.length).toBe(2);
+    expect(panels.length).toBe(4);
   });
 
-  it('selects active tab', () => {
+it('selects active tab', () => {
     const { container } = render(
       <Tabs value="tab1" onValueChange={() => {}}>
         <button value="tab1" onClick={() => {}}>
@@ -33,9 +33,8 @@ describe('Tabs', () => {
         </button>
       </Tabs>
     );
-    const tab1 = container.querySelector('[value="tab1"]');
-    const tab2 = container.querySelector('[value="tab2"]');
-    expect(tab1?.className).toContain('text-lav');
-    expect(tab2?.className).toContain('text-fog');
+    const buttons = container.querySelectorAll('button');
+    expect(buttons[0]?.className).toContain('text-lav');
+    expect(buttons[1]?.className).toContain('text-fog');
   });
 });

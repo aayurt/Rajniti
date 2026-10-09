@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Modal } from './Modal';
 
@@ -24,8 +24,8 @@ describe('Modal', () => {
   });
 
   it('calls onClose when cancel clicked', () => {
-    const handleClose = jest.fn();
-    render(
+    const handleClose = vi.fn();
+    const { container } = render(
       <Modal isOpen={true} onClose={handleClose}>
         <div>Test content</div>
       </Modal>

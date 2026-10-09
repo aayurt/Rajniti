@@ -143,7 +143,7 @@ export function TradeModal({ state, dispatch, myProperties, otherPlayers, onConf
         <Badge>{summary}</Badge>
 
         <div className="flex gap-2">
-          <Button onClick={() => onClose()}>Cancel</Button>
+          <Button onClick={() => dispatch({ type: 'CLOSE' })}>Cancel</Button>
           <Button disabled={!isValid} onClick={() => onConfirm(summary)}>Confirm</Button>
         </div>
       </div>

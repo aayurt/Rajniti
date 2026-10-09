@@ -4,8 +4,8 @@ import { Badge } from './Badge';
 
 describe('Badge', () => {
   it('renders children', () => {
-    const { base } = render(<Badge>12</Badge>);
-    expect(base.textContent).toContain('12');
+    const { container } = render(<Badge>12</Badge>);
+    expect(container.textContent).toContain('12');
   });
 
   it('applies base classes', () => {
