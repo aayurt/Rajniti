@@ -2,13 +2,8 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../game/store';
 import LeftPanel from './LeftPanel';
 import Board from './Board';
+import { APPEARANCES } from './appearance/skins';
 import { SETTINGS, GAMEPLAY_RULES, LOBBY_COPY } from './lobby/content';
-
-const APPEARANCES = [
-  '#c8f04a', '#ffcf3f', '#ff8a3d', '#d94f4f',
-  '#5aa9ff', '#7fd4e8', '#1f9e8e', '#4ade80',
-  '#a0715c', '#c0439c', '#ff7d9c', '#7b5cf0',
-];
 
 const RULE_ICONS = ['🪙', '🏖️', '🔨', '📉', '🤲', '🏘️'];
 
