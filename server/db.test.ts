@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * Tests for the server-side game-session store (server/db.ts).
  *
