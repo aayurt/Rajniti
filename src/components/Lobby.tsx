@@ -3,6 +3,7 @@ import { useGame } from '../game/store';
 import LeftPanel from './LeftPanel';
 import Board from './Board';
 import { SETTINGS, GAMEPLAY_RULES, LOBBY_COPY } from './lobby/content';
+import { SoundPackName } from '../audio/types';
 
 const APPEARANCES = [
   '#c8f04a', '#ffcf3f', '#ff8a3d', '#d94f4f',
@@ -164,6 +165,49 @@ export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' |
               <div className="text-sm font-semibold">{SETTINGS.boardMap.classic}</div>
               <div className="text-xs text-lav">{SETTINGS.boardMap.browse} ›</div>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3 py-2.5">
+            <span>🔊</span>
+            <div className="flex-1">
+              <div className="text-sm font-semibold">{SETTINGS.sound.title}</div>
+              <div className="text-xs text-fog">{SETTINGS.sound.desc}</div>
+            </div>
+            <Toggle on={!!state.sound.enabled} onClick={() => dispatch({ type: 'SET_SOUND_ENABLED', enabled: !state.sound.enabled })} />
+          </div>
+
+          <div className="flex items-center gap-3 py-2.5 border-b border-edge">
+            <span>🔈</span>
+            <div className="flex-1">
+              <div className="text-sm font-semibold">Volume</div>
+              <div className="text-xs text-fog">0-100</div>
+            </div>
+            <select
+              value={state.sound.volume}
+              onChange={(e) => dispatch({ type: 'SET_SOUND_VOLUME', volume: Number(e.target.value) })}
+              className="bg-tile border border-line rounded-md px-2 py-2 text-sm min-h-[44px]"
+            >
+              {[0, 25, 50, 75, 100].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3 py-2.5 border-b border-edge">
+            <span>📢</span>
+            <div className="flex-1">
+              <div className="text-sm font-semibold">{SETTINGS.soundPack.title}</div>
+              <div className="text-xs text-fog">{SETTINGS.soundPack.desc}</div>
+            </div>
+            <select
+              value={state.sound.pack}
+              onChange={(e) => dispatch({ type: 'SET_SOUND_PACK', pack: e.target.value as SoundPackName })}
+              className="bg-tile border border-line rounded-md px-2 py-2 text-sm min-h-[44px]"
+            >
+              {[2, 3, 4, 5, 6].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
           </div>
 
           <b className="text-lav text-sm block text-center my-3">Gameplay rules</b>
