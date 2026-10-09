@@ -116,8 +116,8 @@ export default function Board({ blurred = false, interactive = true }: { blurred
           }}
         >
           <div className="flex gap-7 mt-6 mb-2.5">
-            <Dice value={state.dice[0]} rolling={state.rolling} tilt={-8} />
-            <Dice value={state.dice[1]} rolling={state.rolling} tilt={10} />
+            <Dice value={state.dice[0]} rolling={state.rolling} />
+            <Dice value={state.dice[1]} rolling={state.rolling} />
           </div>
 
           {!blurred && (

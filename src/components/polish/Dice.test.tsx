@@ -3,12 +3,12 @@ import { render } from '@testing-library/react';
 import Dice from '../Dice';
 
 describe('Dice', () => {
-  it('renders with enlarged 120px default size and brighter background via inline style', () => {
+  it('renders with enlarged 92px default size and brighter background via inline style', () => {
     const { container } = render(<Dice value={1} />);
     const diceDiv = container.firstChild as HTMLElement;
 
-    expect(diceDiv.style.width).toBe('120px');
-    expect(diceDiv.style.height).toBe('120px');
+    expect(diceDiv.style.width).toBe('92px');
+    expect(diceDiv.style.height).toBe('92px');
 
     expect(diceDiv.style.background).toBeTruthy();
     expect(diceDiv.style.background).not.toBe('');

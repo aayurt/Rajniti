@@ -14,11 +14,14 @@ body,
 }
 
 body {
-  font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  background: #0b0a14;
-  color: #e8e6ff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  background-color: #130f1d;
+  background-image: linear-gradient(to bottom right, #130f1d, #1a0f1d);
+  background-attachment: fixed;
+  color: #fff;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  accent-color: #6647e0;
 }
 
 ::-webkit-scrollbar {
@@ -40,306 +43,62 @@ body {
   padding-top: env(safe-area-inset-top);
 }
 
-/* ---------- tiles ---------- */
-.tile {
-  background: #25224a;
-  border: 1px solid #34315e;
-  border-radius: 9px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 3px;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.12s, border-color 0.12s;
-  user-select: none;
-}
-.tile:active {
-  transform: scale(0.97);
-}
-.tile.selected {
-  border-color: #7dff5e;
-}
-.tile .t-name {
-  font-size: 9px;
-  font-weight: 600;
-  line-height: 1.1;
-  max-width: 100%;
-  word-wrap: break-word;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.tile .t-price {
-  font-size: 9px;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.14);
-  border-radius: 5px;
-  padding: 1px 4px;
-  margin-top: 4px;
-  color: #d9d6f5;
-}
-.tile .t-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 9px;
-  border-radius: 9px 9px 0 0;
-}
-.tile.side {
-  flex-direction: row;
-  justify-content: flex-start;
+/* ---------- RichUp.io Logo ---------- */
+.richup-logo {
+  display: inline-flex;
+  align-items: baseline;
   gap: 4px;
-  padding: 4px 6px 4px 4px;
-  text-align: left;
 }
-.tile.side .t-name {
-  writing-mode: horizontal-tb;
-  transform: none;
-  letter-spacing: 0;
-}
-.tile.side.right .t-name {
-  transform: none;
-}
-.tile.side .t-price {
-  margin: 0 0 0 auto;
-}
-.tile.side .t-side-bar {
-  width: 9px;
-  align-self: stretch;
-  border-radius: 6px;
-  flex-shrink: 0;
-}
-.tile .t-icon {
-  font-size: 20px;
+.richup-logo .logo-text {
+  font-weight: 900;
+  font-size: 34px;
   line-height: 1;
+  letter-spacing: 0.5px;
+  color: #fff;
 }
-.tile .t-sub {
-  font-size: 9px;
-  color: #8f8aa8;
-  font-weight: 600;
+.richup-logo .logo-accent {
+  color: #a5a0e8;
 }
-.tile .t-big {
-  font-size: 13px;
-  font-weight: 800;
-}
-.tile .flag {
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #0b0a14;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  z-index: 3;
-}
-.top-tile .flag {
-  bottom: -8px;
-  right: 2px;
-}
-.side .flag {
-  top: 50%;
-  transform: translateY(-50%);
-}
-.side.left .flag {
-  right: -8px;
-}
-.side.right .flag {
-  left: -8px;
-}
-.bottom-tile .flag {
-  top: -8px;
-  right: 2px;
-}
-.tile.owned {
-  box-shadow: inset 0 0 0 2px rgba(125, 255, 94, 0.35);
+.richup-logo .logo-io {
+  color: #5b568f;
+  font-style: normal;
+  font-size: 24px;
 }
 
-/* New ID-based tile classes */
-.white-space-nowrap {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.top-tile {
-  align-items: center;
-  justify-content: center;
-}
-.top-tile .t-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.top-tile .t-price {
-  margin-top: 4px;
-}
-.top-tile .flag {
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.top-tile .t-top {
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 9px;
-  border-radius: 9px 9px 0 0;
-}
-
-.bottom-tile {
-  align-items: center;
-  justify-content: center;
-}
-.bottom-tile .t-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.bottom-tile .t-price {
-  margin-top: 4px;
-}
-.bottom-tile .flag {
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.bottom-tile .t-top {
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 9px;
-  border-radius: 0 0 9px 9px;
-}
-
-.side-tile.right {
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-.side-tile.right .t-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  writing-mode: vertical-rl;
-  transform: rotate(0deg);
-  letter-spacing: 0;
-}
-.side-tile.right .t-price {
-  margin: 0 0 0 auto;
-  order: 2;
-}
-.side-tile.right .flag {
-  position: absolute;
-  left: -8px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.side-tile.right .t-side-bar {
-  width: 9px;
-  align-self: stretch;
-  border-radius: 6px;
-  flex-shrink: 0;
-}
-
-.side-tile.left {
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-.side-tile.left .t-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  letter-spacing: 0;
-}
-.side-tile.left .t-price {
-  margin: 0 auto 0 0;
-  order: 2;
-}
-.side-tile.left .flag {
-  position: absolute;
-  right: -8px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.side-tile.left .t-side-bar {
-  width: 9px;
-  align-self: stretch;
-  border-radius: 6px;
-  flex-shrink: 0;
-}
-
-/* ---------- dice ---------- */
-.dice {
-  width: 68px;
-  height: 68px;
+/* ---------- Dice (3D) ---------- */
+.dice-3d {
+  width: 92px;
+  height: 92px;
   background: linear-gradient(145deg, #fff, #d9d6e8);
-  border-radius: 16px;
+  border-radius: 20px;
   position: relative;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), inset 0 2px 4px #fff;
   flex-shrink: 0;
 }
-.pip {
+.dice-3d.d1 {
+  transform: rotate(-8deg);
+}
+.dice-3d.d2 {
+  transform: rotate(10deg);
+}
+.dice-3d .pip {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
   background: #1a1830;
   border-radius: 50%;
 }
 @keyframes shake {
-  0%,
-  100% {
-    transform: rotate(-8deg) translateY(0);
-  }
-  25% {
-    transform: rotate(8deg) translateY(-14px);
-  }
-  50% {
-    transform: rotate(-12deg) translateY(0);
-  }
-  75% {
-    transform: rotate(6deg) translateY(-8px);
-  }
+  0%, 100% { transform: rotate(-8deg) translateY(0); }
+  25% { transform: rotate(8deg) translateY(-14px); }
+  50% { transform: rotate(-12deg) translateY(0); }
+  75% { transform: rotate(6deg) translateY(-8px); }
 }
-.rolling {
+.dice-3d.rolling {
   animation: shake 0.5s ease infinite;
 }
 
-/* ---------- event log ---------- */
-.event-log {
-  max-height: 140px;
-  overflow-y: auto;
-}
-.event-log > div {
-  font-size: 12.5px;
-  line-height: 1.9;
-  text-align: center;
-  color: #b9b4d6;
-}
-.event-log .timestamp {
-  color: #6b68a8;
-  font-size: 10px;
-}
-.event-log .player-name {
-  font-weight: bold;
-  color: #fff;
-}
-
-/* ---------- toggle ---------- */
+/* ---------- Toggle Switch ---------- */
 .toggle {
   width: 44px;
   height: 26px;
@@ -371,3 +130,174 @@ body {
   left: 21px;
   background: #fff;
 }
+
+/* ---------- Button Base ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  min-height: 44px;
+}
+.btn-primary {
+  background: #5b34e8;
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #6c47f0;
+}
+.btn-secondary {
+  background: #2b2850;
+  color: #e8e6ff;
+  border: 1px solid #3a3670;
+}
+.btn-secondary:hover {
+  background: #34315e;
+}
+.btn-danger {
+  background: #e05e3a;
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #c94d2c;
+}
+.btn-success {
+  background: #7dff5e;
+  color: #0b0a14;
+}
+.btn-success:hover {
+  background: #6de050;
+}
+.btn-ghost {
+  background: transparent;
+  color: #8f8aa8;
+}
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* ---------- Panel/Card ---------- */
+.panel {
+  background: #1a1830;
+  border: 1px solid #2b2850;
+  border-radius: 12px;
+}
+
+/* ---------- Avatar/Token ---------- */
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.avatar-sm {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+.avatar-lg {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+}
+
+/* ---------- Chat Bubble ---------- */
+.chat-bubble {
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  max-width: 75%;
+  background: #25224a;
+}
+
+/* ---------- Input ---------- */
+.input {
+  background: transparent;
+  border: 1px solid #3a3670;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #e8e6ff;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+}
+.input:focus {
+  border-color: #5b34e8;
+  box-shadow: 0 0 0 2px rgba(91, 52, 232, 0.2);
+}
+.input::placeholder {
+  color: #8f8aa8;
+}
+
+/* ---------- Select ---------- */
+.select {
+  background: #25224a;
+  border: 1px solid #3a3670;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #e8e6ff;
+  font-size: 13px;
+  outline: none;
+  min-height: 44px;
+}
+.select:focus {
+  border-color: #5b34e8;
+}
+
+/* ---------- Badge ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+.badge-beta {
+  background: #8b7cf0;
+  color: #0b0a14;
+}
+.badge-host {
+  background: #ffcf3f;
+  color: #0b0a14;
+}
+
+/* ---------- Text Colors ---------- */
+.text-muted { color: #8f8aa8; }
+.text-lavender { color: #a5a0e8; }
+.text-lime { color: #7dff5e; }
+.text-grape { color: #8b7cf0; }
+.text-orange { color: #ff9f1c; }
+.text-rose { color: #ff6b9d; }
+.text-gold { color: #ffcf3f; }
+
+/* ---------- Safe Area ---------- */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pt-safe { padding-top: env(safe-area-inset-top); }
+
+/* ---------- Animations ---------- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-fade-in { animation: fadeIn 0.2s ease; }
+.animate-slide-up { animation: slideUp 0.3s ease; }
+.animate-pulse { animation: pulse 1.5s ease-in-out infinite; }
