@@ -11,8 +11,21 @@ function TileView({ t, owned, tokens, selected, onSelect }: {
   selected: boolean;
   onSelect: () => void;
 }) {
-  const isTop = t.id <= 10;
-  const cls = `tile ${t.side ? `side ${t.side}` : ''} ${isTop || (t.id >= 20 && t.id <= 30) ? 'top-tile bottom-tile' : ''} ${owned ? 'owned' : ''} ${selected ? 'selected' : ''}`;
+  let tileClass: string;
+  if (t.id === 0 || t.id === 10 || t.id === 20 || t.id === 30) {
+    tileClass = 'corner-tile';
+  } else if (t.id >= 1 && t.id <= 9) {
+    tileClass = 'top-tile';
+  } else if (t.id >= 11 && t.id <= 19) {
+    tileClass = 'side-tile right';
+  } else if (t.id >= 21 && t.id <= 29) {
+    tileClass = 'bottom-tile';
+  } else if (t.id >= 31 && t.id <= 39) {
+    tileClass = 'side-tile left';
+  } else {
+    tileClass = '';
+  }
+  const cls = `tile ${tileClass} ${owned ? 'owned' : ''} ${selected ? 'selected' : ''}`;
   const bar = t.color ? (
     t.side ? (
       <div className="t-side-bar" style={{ background: t.color }} />
@@ -111,7 +124,7 @@ export default function Board({ blurred = false, interactive = true }: { blurred
   const canAfford = pendingTile && me && pendingTile.price !== undefined && me.cash >= pendingTile.price;
 
   return (
-    <div className="bg-[#121022] border border-[#26234a] rounded-[14px] p-2 h-full flex flex-col min-h-0">
+    <div className="aspect-square max-h-[calc(100dvh-24px)] max-w-full mx-auto flex flex-col min-h-0">
       <div
         className="flex-1 grid min-h-0"
         style={{ gridTemplateColumns: 'repeat(11, 1fr)', gridTemplateRows: 'repeat(11, 1fr)', gap: 6 }}
@@ -130,7 +143,7 @@ export default function Board({ blurred = false, interactive = true }: { blurred
         <div
           className="relative flex flex-col items-center justify-start px-3 overflow-hidden rounded-xl"
           style={{
-            gridArea: '2 / 2 / 12 / 12',
+            gridArea: '2 / 2 / 11 / 11',
             background: 'radial-gradient(ellipse at 50% 30%,#171434 0%,#0e0c1e 65%)',
             filter: blurred ? 'blur(6px)' : undefined,
             pointerEvents: blurred ? 'none' : undefined,

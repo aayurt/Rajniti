@@ -71,6 +71,9 @@ body {
   line-height: 1.1;
   max-width: 100%;
   word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .tile .t-price {
   font-size: 9px;
@@ -80,7 +83,6 @@ body {
   padding: 1px 4px;
   margin-top: 4px;
   color: #d9d6f5;
-  white-space: nowrap;
 }
 .tile .t-top {
   position: absolute;
@@ -162,34 +164,139 @@ body {
   box-shadow: inset 0 0 0 2px rgba(125, 255, 94, 0.35);
 }
 
-.token-dot {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
+/* New ID-based tile classes */
+.white-space-nowrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-tile {
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  border: 2px solid rgba(0, 0, 0, 0.5);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  pointer-events: none;
+}
+.top-tile .t-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.top-tile .t-price {
+  margin-top: 4px;
+}
+.top-tile .flag {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.top-tile .t-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 9px;
+  border-radius: 9px 9px 0 0;
+}
+
+.bottom-tile {
+  align-items: center;
+  justify-content: center;
+}
+.bottom-tile .t-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bottom-tile .t-price {
+  margin-top: 4px;
+}
+.bottom-tile .flag {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.bottom-tile .t-top {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 9px;
+  border-radius: 0 0 9px 9px;
+}
+
+.side-tile.right {
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.side-tile.right .t-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  writing-mode: vertical-rl;
+  transform: rotate(0deg);
+  letter-spacing: 0;
+}
+.side-tile.right .t-price {
+  margin: 0 0 0 auto;
+  order: 2;
+}
+.side-tile.right .flag {
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.side-tile.right .t-side-bar {
+  width: 9px;
+  align-self: stretch;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.side-tile.left {
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.side-tile.left .t-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 0;
+}
+.side-tile.left .t-price {
+  margin: 0 auto 0 0;
+  order: 2;
+}
+.side-tile.left .flag {
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.side-tile.left .t-side-bar {
+  width: 9px;
+  align-self: stretch;
+  border-radius: 6px;
   flex-shrink: 0;
 }
 
 /* ---------- dice ---------- */
 .dice {
-  width: 92px;
-  height: 92px;
+  width: 68px;
+  height: 68px;
   background: linear-gradient(145deg, #fff, #d9d6e8);
-  border-radius: 20px;
+  border-radius: 16px;
   position: relative;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), inset 0 2px 4px #fff;
   flex-shrink: 0;
 }
 .pip {
   position: absolute;
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
   background: #1a1830;
   border-radius: 50%;
 }
@@ -210,6 +317,26 @@ body {
 }
 .rolling {
   animation: shake 0.5s ease infinite;
+}
+
+/* ---------- event log ---------- */
+.event-log {
+  max-height: 140px;
+  overflow-y: auto;
+}
+.event-log > div {
+  font-size: 12.5px;
+  line-height: 1.9;
+  text-align: center;
+  color: #b9b4d6;
+}
+.event-log .timestamp {
+  color: #6b68a8;
+  font-size: 10px;
+}
+.event-log .player-name {
+  font-weight: bold;
+  color: #fff;
 }
 
 /* ---------- toggle ---------- */

@@ -39,7 +39,7 @@ export default function Dice({ value, rolling, tilt = -8 }: { value: number; rol
       style={rolling ? undefined : { transform: `rotate(${tilt}deg)` }}
     >
       {PIPS[value].map(([x, y], i) => (
-        <div key={i} className="pip" style={{ left: `calc(${x}% - 7px)`, top: `calc(${y}% - 7px)` }} />
+        <div key={i} className="pip" style={{ left: `calc(${x}% - 5px)`, top: `calc(${y}% - 5px)` }} />
       ))}
     </div>
   );
