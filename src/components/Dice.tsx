@@ -32,11 +32,16 @@ const PIPS: Record<number, [number, number][]> = {
   ],
 };
 
-export default function Dice({ value, rolling, tilt = -8 }: { value: number; rolling?: boolean; tilt?: number }) {
+export default function Dice({ value, rolling, tilt = -8, size = 120 }: { value: number; rolling?: boolean; tilt?: number; size?: number }) {
   return (
     <div
       className={`dice ${rolling ? 'rolling' : ''}`}
-      style={rolling ? undefined : { transform: `rotate(${tilt}deg)` }}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        background: 'linear-gradient(145deg, #ffffff, #e6e6e6)',
+        ...(rolling ? undefined : { transform: `rotate(${tilt}deg)` })
+      }}
     >
       {PIPS[value].map(([x, y], i) => (
         <div key={i} className="pip" style={{ left: `calc(${x}% - 5px)`, top: `calc(${y}% - 5px)` }} />
