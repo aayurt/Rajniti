@@ -89,7 +89,7 @@ export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' |
                       style={{ background: c }}
                       aria-label={`Appearance ${c}`}
                     >
-                      {active && '👀'}
+                      {active && <span className="text-xl">👀</span>}
                     </button>
                   );
                 })}

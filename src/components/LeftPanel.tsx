@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '../game/store';
 import { shareCopy, adblockCopy, connectionCopy, chatCopy } from './panels/copy';
+import Character from './richtile/Character';
 
 function Blob({ color, size = 30 }: { color: string; size?: number }) {
   return (
-    <div
-      className="rounded-full flex items-center justify-center flex-shrink-0"
-      style={{ width: size, height: size, background: color, fontSize: size * 0.55 }}
-    >
-      👀
-    </div>
+    <Character color={color} size={size} />
   );
 }
 

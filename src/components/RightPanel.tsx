@@ -4,6 +4,7 @@ import { useGame } from '../game/store';
 import { TradeModal, tradeReducer, initialTradeState } from './TradeModal';
 import { tradeCopy } from './panels/copy';
 import { sortPlayersWithHostFirst, formatCash } from './panels/players';
+import Character from './richtile/Character';
 
 export default function RightPanel() {
   const { state, dispatch } = useGame();
@@ -44,7 +45,7 @@ export default function RightPanel() {
                 className="w-[30px] h-[30px] rounded-full flex items-center justify-center text-base flex-shrink-0"
                 style={{ background: p.color }}
               >
-                👀
+                <Character color={p.color} size={30} />
               </div>
               <div className="flex-1 text-[13px]">
                 {p.name} {p.isOwner && <span className="ml-1 bg-[#1a1830] border border-[#2b2850] text-[#8f8aa8] text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Host</span>} {p.isOut && <span className="text-fog">(out)</span>}

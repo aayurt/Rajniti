@@ -128,7 +128,7 @@ export default function Board({ blurred = false, interactive = true }: { blurred
                   className="inline-block w-4 h-4 rounded-full text-[10px] text-center mr-1"
                   style={{ background: currentPlayer.color }}
                 >
-                  👀
+                  <Character color={currentPlayer.color} size={20} />
                 </span>{' '}
                 <span><b>{currentPlayer.name}</b> <span className="text-fog">is playing...</span></span>
                 <span className="text-fog font-mono ml-2">

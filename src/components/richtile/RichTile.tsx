@@ -117,8 +117,8 @@ export default function RichTile({
               : orient === 'top'
               ? { top: 0, left: 0, right: 0, height: '5px', borderRadius: '0.5em 0.5em 0 0' }
               : orient === 'left'
-              ? { top: 0, bottom: 0, left: 0, width: '5px', borderRadius: '0.5em 0 0 0.5em' }
-              : { top: 0, bottom: 0, right: 0, width: '5px', borderRadius: '0 0.5em 0.5em 0' }),
+              ? { top: 0, bottom: 0, left: 0, width: '5px', height: '100%', borderRadius: '0.5em 0 0 0.5em' }
+              : { top: 0, bottom: 0, right: 0, width: '5px', height: '100%', borderRadius: '0 0.5em 0.5em 0' }),
           }}
         />
       )}
