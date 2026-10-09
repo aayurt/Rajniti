@@ -76,13 +76,6 @@ export default function RichTile({
     ...(groupColor
       ? {
           background: `radial-gradient(ellipse at 50% 50%, ${groupColor}24 0%, #171530 85%)`,
-          ...(orient === 'left'
-            ? { borderLeft: `3px solid ${groupColor}55`, borderTop: 'none', borderBottom: 'none', borderRight: 'none' }
-            : orient === 'right'
-            ? { borderRight: `3px solid ${groupColor}55`, borderTop: 'none', borderBottom: 'none', borderLeft: 'none' }
-            : orient === 'top'
-            ? { borderTop: `3px solid ${groupColor}55`, borderBottom: 'none', borderLeft: 'none', borderRight: 'none' }
-            : { borderBottom: `3px solid ${groupColor}55`, borderTop: 'none', borderLeft: 'none', borderRight: 'none' }),
         }
       : {}),
   };
