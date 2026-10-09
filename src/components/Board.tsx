@@ -3,93 +3,59 @@ import { TILES, tileArea, isBuyable } from '../data/tiles';
 import type { Tile } from '../data/tiles';
 import { useGame } from '../game/store';
 import Dice from './Dice';
+import RichTile from './richtile/RichTile';
+import type { RichOrient } from './richtile/RichTile';
+import Character, { tokenSlot } from './richtile/Character';
+import { flagCodeFromEmoji } from './richtile/flags';
 
-function TileView({ t, owned, tokens, selected, onSelect }: {
+function orientFor(id: number): RichOrient {
+  if (id >= 1 && id <= 9) return 'top';
+  if (id >= 11 && id <= 19) return 'right';
+  if (id >= 31 && id <= 39) return 'left';
+  return 'bottom';
+}
+
+function TileView({ t, ownedBy, tokens, selected, onSelect }: {
   t: Tile;
-  owned: boolean;
+  ownedBy: string | undefined;
   tokens: { color: string }[];
   selected: boolean;
   onSelect: () => void;
 }) {
-  let tileClass: string;
-  if (t.id === 0 || t.id === 10 || t.id === 20 || t.id === 30) {
-    tileClass = 'corner-tile';
-  } else if (t.id >= 1 && t.id <= 9) {
-    tileClass = 'top-tile';
-  } else if (t.id >= 11 && t.id <= 19) {
-    tileClass = 'side-tile right';
-  } else if (t.id >= 21 && t.id <= 29) {
-    tileClass = 'bottom-tile';
-  } else if (t.id >= 31 && t.id <= 39) {
-    tileClass = 'side-tile left';
-  } else {
-    tileClass = '';
-  }
-  const cls = `tile ${tileClass} ${owned ? 'owned' : ''} ${selected ? 'selected' : ''}`;
-  const bar = t.color ? (
-    t.side ? (
-      <div className="t-side-bar" style={{ background: t.color }} />
-    ) : (
-      <div className="t-top" style={{ background: t.color }} />
-    )
-  ) : null;
-
-  let inner: React.ReactNode;
-  if (t.kind === 'start') {
-    inner = (
-      <>
-        <div className="t-big" style={{ color: '#7dff5e' }}>START</div>
-        <div className="t-icon">▶▶</div>
-      </>
-    );
-  } else if (t.kind === 'prison-pass' || t.kind === 'vacation' || t.kind === 'goto-prison') {
-    inner = (
-      <>
-        <div className="t-icon">{t.icon}</div>
-        <div className="t-name">{t.name}</div>
-        {t.sub && <div className="t-sub">{t.sub}</div>}
-      </>
-    );
-  } else if ((t.kind === 'treasure' || t.kind === 'surprise') && !t.price) {
-    inner = (
-      <>
-        <div className="t-sub" style={{ color: t.kind === 'treasure' ? '#ff9f1c' : '#ff6b9d' }}>{t.name}</div>
-        <div className="t-icon">{t.icon}</div>
-      </>
-    );
-  } else {
-    inner = (
-      <>
-        {t.icon && <div className="t-icon">{t.icon}</div>}
-        <div className="t-name">{t.name}</div>
-        {t.price !== undefined && <div className="t-price">{t.price}$</div>}
-      </>
-    );
-  }
-
   return (
-    <div className={cls} style={{ gridArea: tileArea(t.id) }} title={t.name} onClick={onSelect}>
-      {bar}
-      {inner}
-      {t.flag && <div className="flag">{t.flag}</div>}
+    <RichTile
+      index={t.id}
+      name={t.name}
+      price={t.price}
+      flag={flagCodeFromEmoji(t.flag)}
+      groupColor={t.color}
+      kind={t.kind}
+      icon={t.icon}
+      sub={t.sub}
+      level={0}
+      ownedBy={ownedBy}
+      selected={selected}
+      orient={orientFor(t.id)}
+      onSelect={onSelect}
+      style={{ gridArea: tileArea(t.id) }}
+    >
       {tokens.length > 0 && (
-        <div className="tokens-container absolute bottom-1 left-0 right-0 flex justify-center items-end px-1 pointer-events-none" >
-          {tokens.map((tk, i) => (
-            <div
-              key={i}
-              className="token-dot relative"
-              style={{
-                background: tk.color,
-                marginLeft: i > 0 ? '-8px' : '0',
-                zIndex: tokens.length - i
-              }}
-            >
-              👀
-            </div>
-          ))}
+        <div className="rich-tokens">
+          {tokens.map((tk, i) => {
+            const slot = tokenSlot(i, tokens.length);
+            return (
+              <div
+                key={i}
+                className="rich-token"
+                style={{ left: `${slot.x}%`, top: `${slot.y}%`, zIndex: tokens.length - i }}
+              >
+                <Character color={tk.color} flip={i % 2 === 1} />
+              </div>
+            );
+          })}
         </div>
       )}
-    </div>
+    </RichTile>
   );
 }
 
@@ -133,7 +99,7 @@ export default function Board({ blurred = false, interactive = true }: { blurred
           <TileView
             key={t.id}
             t={t}
-            owned={state.owned[t.id] !== undefined}
+            ownedBy={state.owned[t.id]}
             tokens={state.players.filter((p) => p.pos === t.id && !p.isOut).map((p) => ({ color: p.color }))}
             selected={state.selected === t.id}
             onSelect={() => interactive && !blurred && dispatch({ type: 'SELECT', id: t.id })}
@@ -143,7 +109,7 @@ export default function Board({ blurred = false, interactive = true }: { blurred
         <div
           className="relative flex flex-col items-center justify-start px-3 overflow-hidden rounded-xl"
           style={{
-            gridArea: '2 / 2 / 11 / 11',
+            gridArea: '2 / 2 / 12 / 11',
             background: 'radial-gradient(ellipse at 50% 30%,#171434 0%,#0e0c1e 65%)',
             filter: blurred ? 'blur(6px)' : undefined,
             pointerEvents: blurred ? 'none' : undefined,
@@ -212,15 +178,12 @@ export default function Board({ blurred = false, interactive = true }: { blurred
                 </div>
               )}
 
-              <div className="text-[12.5px] leading-[1.9] text-center text-[#b9b4d6] max-w-[560px] overflow-y-auto">
-                {[...state.log].reverse().slice(0, 12).map((l) => (
+              <div className="event-log max-w-[560px]">
+                {[...state.log].reverse().slice(0, 10).map((l) => (
                   <div key={l.id} className={l.muted ? 'text-fog' : ''}>
                     {l.text}
                   </div>
                 ))}
-              </div>
-              <div className="text-fog text-xs mt-1">
-                My properties ({myProps.length})
               </div>
             </>
           )}

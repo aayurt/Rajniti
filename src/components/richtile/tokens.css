@@ -1,0 +1,587 @@
+/* RichUp design tokens (from samples/tile-shanghai-reference.html).
+   Loaded by RichTile so the app shell stays untouched. */
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  font-family: Nunito, 'Segoe UI', sans-serif, 'Segoe UI Emoji';
+  margin: 0;
+  background-color: #130f1d;
+  background-image: linear-gradient(to bottom right, #130f1d, #1a0f1d);
+  background-attachment: fixed;
+  color: #fff;
+  accent-color: #6647e0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The tile root must not clip the edge flags. */
+.rich-tile {
+  position: relative;
+  background-color: rgb(38, 42, 76);
+  background-image: linear-gradient(to right bottom, rgb(38, 42, 76), rgb(47, 38, 76));
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  flex: 1 0 0;
+  border-radius: 0.5em;
+  cursor: pointer;
+  padding: 0;
+  user-select: none;
+  overflow: visible;
+}
+
+.rich-tile::before {
+  content: '';
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: #fff;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.rich-tile:hover::before {
+  opacity: 0.07;
+}
+
+.rich-tile.selected {
+  outline: 2px solid #7dff5e;
+  outline-offset: -2px;
+}
+
+.rich-clip {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rich-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  border-radius: 0.5em 0.5em 0 0;
+}
+
+/* Orientation: the tile box stays in horizontal flow so grid sizing is exact;
+   only the inner body takes the reference vertical recipe. */
+.rich-tile .rich-body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding: 0.5rem 0.25rem;
+}
+
+.rich-tile.rich-top .rich-body {
+  flex-direction: column-reverse;
+}
+
+.rich-tile.rich-left .rich-body {
+  writing-mode: vertical-rl;
+  transform: rotate(0.04deg);
+}
+
+.rich-tile.rich-right .rich-body {
+  writing-mode: vertical-rl;
+  transform: rotate(180.04deg);
+}
+
+/* Corner kinds: show icon + name + sub, no price/flag/level. */
+.rich-kind-start .rich-bar { display: none; }
+.rich-kind-start .rich-body { flex-direction: column; }
+.rich-kind-start .rich-icon { font-size: 2.5rem; }
+.rich-kind-start .rich-name { font-size: 1.5em; margin-top: 0.5rem; }
+
+.rich-kind-prison-pass .rich-bar { display: none; }
+.rich-kind-prison-pass .rich-icon { font-size: 2rem; }
+.rich-kind-prison-pass .rich-name { font-size: 1.1em; }
+.rich-kind-prison-pass .rich-sub { font-size: 0.75em; color: #aaa; }
+
+.rich-kind-vacation .rich-bar { display: none; }
+.rich-kind-vacation .rich-icon { font-size: 2.2rem; }
+
+.rich-kind-goto-prison .rich-bar { display: none; }
+.rich-kind-goto-prison .rich-icon { font-size: 2.2rem; }
+
+/* Tile kinds with special backgrounds. */
+.rich-kind-treasure {
+  background-image: linear-gradient(135deg, rgba(255, 159, 28, 0.25), rgba(214, 88, 10, 0.25)) !important;
+}
+
+.rich-kind-surprise {
+  background-image: linear-gradient(135deg, rgba(255, 107, 157, 0.22), rgba(255, 107, 157, 0.12)) !important;
+}
+
+.rich-kind-tax {
+  background-image: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.15)) !important;
+}
+
+/* Edge flags: straddle the outer edge of the tile. */
+.rich-flag-edge {
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rich-flag-edge[data-flag-edge="top"] {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.rich-flag-edge[data-flag-edge="bottom"] {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(50%);
+}
+
+.rich-flag-edge[data-flag-edge="left"] {
+  left: 0;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.rich-flag-edge[data-flag-edge="right"] {
+  right: 0;
+  top: 50%;
+  transform: translateX(50%) translateY(-50%);
+}
+
+/* Background flag blurred behind the name. */
+.rich-flag-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.175;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rich-flag-bg span {
+  position: absolute;
+  inset: 0;
+  filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rich-flag {
+  width: 2rem;
+  height: 2rem;
+  margin-top: -1rem;
+  margin-bottom: -1rem;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.rich-name {
+  font-family: 'Yanone Kaffeesatz', 'Segoe UI', serif;
+  font-weight: 400;
+  font-size: 1.125em;
+  line-height: 0.85em;
+  text-align: center;
+  align-self: stretch;
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+  overflow-wrap: break-word;
+  text-shadow: 0 0 0.5em #262a4c;
+  z-index: 1;
+}
+
+.rich-sub {
+  font-size: 0.65em;
+  color: #aaa;
+  margin-top: 0.2rem;
+  text-align: center;
+  z-index: 1;
+}
+
+.rich-icon {
+  font-size: 20px;
+  line-height: 1;
+  z-index: 1;
+}
+
+.rich-name {
+  font-family: 'Yanone Kaffeesatz', 'Segoe UI', serif;
+  font-weight: 400;
+  font-size: 1.125em;
+  line-height: 0.85em;
+  text-align: center;
+  align-self: stretch;
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+  overflow-wrap: break-word;
+  text-shadow: 0 0 0.5em #262a4c;
+  z-index: 1;
+}
+
+.rich-price {
+  display: flex;
+  flex-direction: inherit;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1em;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.25em;
+  padding: 0.25rem 0.5rem;
+  margin: 0.25rem;
+  color: #fff;
+  z-index: 1;
+  max-width: 100%;
+}
+
+.rich-price [data-owner-badge] {
+  display: inline-flex;
+  color: #7dff5e;
+}
+
+.rich-level {
+  display: flex;
+  gap: 2px;
+  min-height: 6px;
+  align-items: center;
+  z-index: 1;
+}
+
+.rich-level [data-level-pip] {
+  width: 8px;
+  height: 5px;
+  border-radius: 2px;
+  background: #7dff5e;
+  display: inline-block;
+}
+
+/* Corner kinds: show icon + name + sub, no price/flag/level. */
+.rich-kind-start .rich-bar { display: none; }
+.rich-kind-start .rich-body { flex-direction: column; }
+.rich-kind-start .rich-icon { font-size: 2.5rem; }
+.rich-kind-start .rich-name { font-size: 1.5em; margin-top: 0.5rem; }
+
+.rich-kind-prison-pass .rich-bar { display: none; }
+.rich-kind-prison-pass .rich-icon { font-size: 2rem; }
+.rich-kind-prison-pass .rich-name { font-size: 1.1em; }
+.rich-kind-prison-pass .rich-sub { font-size: 0.75em; color: #aaa; }
+
+.rich-kind-vacation .rich-bar { display: none; }
+.rich-kind-vacation .rich-icon { font-size: 2.2rem; }
+
+.rich-kind-goto-prison .rich-bar { display: none; }
+.rich-kind-goto-prison .rich-icon { font-size: 2.2rem; }
+
+/* Tile kinds with special backgrounds. */
+.rich-kind-treasure {
+  background-image: linear-gradient(135deg, rgba(255, 159, 28, 0.25), rgba(214, 88, 10, 0.25)) !important;
+}
+
+.rich-kind-surprise {
+  background-image: linear-gradient(135deg, rgba(255, 107, 157, 0.22), rgba(255, 107, 157, 0.12)) !important;
+}
+
+.rich-kind-tax {
+  background-image: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.15)) !important;
+}
+
+/* Edge flags: straddle the outer edge of the tile. */
+.rich-flag-edge {
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rich-flag-edge[data-flag-edge="top"] {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.rich-flag-edge[data-flag-edge="bottom"] {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(50%);
+}
+
+.rich-flag-edge[data-flag-edge="left"] {
+  left: 0;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.rich-flag-edge[data-flag-edge="right"] {
+  right: 0;
+  top: 50%;
+  transform: translateX(50%) translateY(-50%);
+}
+
+/* Background flag blurred behind the name. */
+.rich-flag-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.175;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rich-flag-bg span {
+  position: absolute;
+  inset: 0;
+  filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rich-flag {
+  width: 2rem;
+  height: 2rem;
+  margin-top: -1rem;
+  margin-bottom: -1rem;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.rich-price {
+  display: flex;
+  flex-direction: inherit;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1em;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.25em;
+  padding: 0.25rem 0.5rem;
+  margin: 0.25rem;
+  color: #fff;
+  z-index: 1;
+  max-width: 100%;
+}
+
+.rich-price [data-owner-badge] {
+  display: inline-flex;
+  color: #7dff5e;
+}
+
+.rich-level {
+  display: flex;
+  gap: 2px;
+  min-height: 6px;
+  align-items: center;
+  z-index: 1;
+}
+
+.rich-level [data-level-pip] {
+  width: 8px;
+  height: 5px;
+  border-radius: 2px;
+  background: #7dff5e;
+  display: inline-block;
+}
+
+/* Corner kinds: show icon + name + sub, no price/flag/level. */
+.rich-kind-start .rich-bar { display: none; }
+.rich-kind-start .rich-body { flex-direction: column; }
+.rich-kind-start .rich-icon { font-size: 2.5rem; }
+.rich-kind-start .rich-name { font-size: 1.5em; margin-top: 0.5rem; }
+
+.rich-kind-prison-pass .rich-bar { display: none; }
+.rich-kind-prison-pass .rich-icon { font-size: 2rem; }
+.rich-kind-prison-pass .rich-name { font-size: 1.1em; }
+.rich-kind-prison-pass .rich-sub { font-size: 0.75em; color: #aaa; }
+
+.rich-kind-vacation .rich-bar { display: none; }
+.rich-kind-vacation .rich-icon { font-size: 2.2rem; }
+
+.rich-kind-goto-prison .rich-bar { display: none; }
+.rich-kind-goto-prison .rich-icon { font-size: 2.2rem; }
+
+/* Tile kinds with special backgrounds. */
+.rich-kind-treasure {
+  background-image: linear-gradient(135deg, rgba(255, 159, 28, 0.25), rgba(214, 88, 10, 0.25)) !important;
+}
+
+.rich-kind-surprise {
+  background-image: linear-gradient(135deg, rgba(255, 107, 157, 0.22), rgba(255, 107, 157, 0.12)) !important;
+}
+
+.rich-kind-tax {
+  background-image: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.15)) !important;
+}
+
+/* Edge flags: straddle the outer edge of the tile. */
+.rich-flag-edge {
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rich-flag-edge[data-flag-edge="top"] {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.rich-flag-edge[data-flag-edge="bottom"] {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(50%);
+}
+
+.rich-flag-edge[data-flag-edge="left"] {
+  left: 0;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.rich-flag-edge[data-flag-edge="right"] {
+  right: 0;
+  top: 50%;
+  transform: translateX(50%) translateY(-50%);
+}
+
+/* Background flag blurred behind the name. */
+.rich-flag-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.175;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rich-flag-bg span {
+  position: absolute;
+  inset: 0;
+  filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rich-flag {
+  width: 2rem;
+  height: 2rem;
+  margin-top: -1rem;
+  margin-bottom: -1rem;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+/* The tile root must not clip the edge flags. */
+.rich-tile {
+  position: relative;
+  background-color: rgb(38, 42, 76);
+  background-image: linear-gradient(to right bottom, rgb(38, 42, 76), rgb(47, 38, 76));
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  flex: 1 0 0;
+  border-radius: 0.5em;
+  cursor: pointer;
+  padding: 0;
+  user-select: none;
+  overflow: visible;
+}
+
+.rich-tile::before {
+  content: '';
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: #fff;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.rich-tile:hover::before {
+  opacity: 0.07;
+}
+
+.rich-tile.selected {
+  outline: 2px solid #7dff5e;
+  outline-offset: -2px;
+}
+
+/* Character tokens: box-relative slots, glide + pop. */
+.rich-tokens {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.rich-token {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: left 0.3s ease, top 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
+  animation: rich-token-pop 0.25s ease;
+}
+
+@keyframes rich-token-pop {
+  from {
+    scale: 0.4;
+  }
+  to {
+    scale: 1;
+  }
+}
