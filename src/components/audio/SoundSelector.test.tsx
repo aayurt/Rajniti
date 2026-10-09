@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import SoundSelector from './SoundSelector';
-import { GameProvider } from '../game/store';
+import { GameProvider } from '../../game/store';
 
 describe('SoundSelector component', () => {
   it('renders sound pack options', () => {

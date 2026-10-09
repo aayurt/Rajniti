@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 import { soundEngine } from './soundEngine';
 import { SoundEvent } from './types';
 
-vitest.spyOn(console, 'log').mockFn();
+vi.spyOn(console, 'log');
 
 describe('SoundEngine', () => {
   it('has default state', () => {
@@ -47,10 +47,10 @@ describe('SoundEngine', () => {
   it('returns correct volume level', () => {
     expect(soundEngine.getVolumeLevel()).toBe('high');
 
-    const engineLow = soundEngine.constructor.createFromState({ enabled: true, volume: 10, pack: 'classic' });
+    const engineLow = soundEngine.createFromState({ enabled: true, volume: 10, pack: 'classic' });
     expect(engineLow.getVolumeLevel()).toBe('low');
 
-    const engineMedium = soundEngine.constructor.createFromState({ enabled: true, volume: 50, pack: 'classic' });
+    const engineMedium = soundEngine.createFromState({ enabled: true, volume: 50, pack: 'classic' });
     expect(engineMedium.getVolumeLevel()).toBe('medium');
   });
 
@@ -59,12 +59,12 @@ describe('SoundEngine', () => {
   });
 
   it('does not play when disabled', () => {
-    const engine = soundEngine.constructor.createFromState({ enabled: false, volume: 100, pack: 'classic' });
+    const engine = soundEngine.createFromState({ enabled: false, volume: 100, pack: 'classic' });
     engine.play('rollDice');
   });
 
   it('uses correct audio URL from pack', () => {
-    const engine = soundEngine.constructor.createFromState({ enabled: true, volume: 100, pack: 'funny' });
+    const engine = soundEngine.createFromState({ enabled: true, volume: 100, pack: 'funny' });
     engine.play('rollDice');
   });
 
@@ -75,7 +75,7 @@ describe('SoundEngine', () => {
   it('plays all sound events', () => {
     const events: SoundEvent[] = ['rollDice', 'moveStep', 'buyProperty', 'payRent', 'jail', 'win', 'bankrupt'];
     for (const event of events) {
-      const engine = soundEngine.constructor.createFromState({ enabled: true, volume: 100, pack: 'classic' });
+      const engine = soundEngine.createFromState({ enabled: true, volume: 100, pack: 'classic' });
       engine.play(event);
     }
   });

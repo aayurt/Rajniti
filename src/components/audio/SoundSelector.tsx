@@ -1,5 +1,5 @@
 import { SoundPackName } from '../../audio/types';
-import { useGame } from '../game/store';
+import { useGame } from '../../game/store';
 
 const SoundPackLabels: Record<SoundPackName, string> = {
   classic: 'Classic',
@@ -20,7 +20,7 @@ export default function SoundSelector() {
       <div className="flex items-center gap-3 py-2.5 border-b border-edge">
         <span>🔊</span>
         <div className="flex-1">
-          <div className="text-sm font-semibold">{SoundPackLabels[state.pack]}</div>
+          <div className="text-sm font-semibold">{SoundPackLabels[state.sound.pack]}</div>
           <div className="text-xs text-fog">Current sound pack</div>
         </div>
         <Toggle on={false} onClick={() => {}} />
@@ -36,12 +36,12 @@ export default function SoundSelector() {
       </div>
 
       <div className="flex flex-col items-center gap-2 my-4">
-        {['classic', 'funny', 'got'].map((pack) => {
-          const active = state.pack === pack;
+{['classic', 'funny', 'got'].map((pack: SoundPackName) => {
+          const active = state.sound.pack === pack;
           return (
             <button
               key={pack}
-              onClick={() => dispatch({ type: 'SET_SOUND_PACK', pack })}
+              onClick={() => dispatch({ type: 'SET_SOUND_PACK', pack: pack as SoundPackName })}
               className={`w-full rounded-md px-4 py-2 text-left ${
                 active ? 'bg-gray-100 font-medium' : 'text-fog hover:text-lav'
               }`}

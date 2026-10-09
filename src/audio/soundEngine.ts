@@ -1,5 +1,5 @@
-import { AudioState, SoundEvent, SoundPackName, soundPacks, VolumeLevel } from './types';
-import { allPackNames, defaultPackName } from './packs';
+import { AudioState, SoundEvent, SoundPackName, VolumeLevel } from './types';
+import { allPackNames, defaultPackName, soundPacks } from './packs';
 
 export type { AudioState, SoundEvent, SoundPackName, VolumeLevel };
 
@@ -49,8 +49,8 @@ export const soundEngine = {
     console.log(`[Sound] Playing ${audioUrl} (volume: ${this.state.volume}, pack: ${this.state.pack})`);
   },
 
-  static createFromState(state: AudioState) {
-    const engine = Object.create(this);
+  createFromState(state: AudioState) {
+    const engine = Object.create(soundEngine);
     engine.state = state;
     return engine;
   },
