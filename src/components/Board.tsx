@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { TILES, tileArea, isBuyable } from '../data/tiles';
+import { tileArea, isBuyable } from '../data/tiles';
 import type { Tile } from '../data/tiles';
+import { MAPS } from '../data/maps';
 import { useGame } from '../game/store';
 import Dice from './Dice';
 import RichTile from './richtile/RichTile';
@@ -85,9 +86,10 @@ export default function Board({ blurred = false, interactive = true }: { blurred
   };
 
   const me = state.players.find((p) => p.isYou);
+  const map = MAPS[state.mapId];
   const myProps = Object.entries(state.owned).filter(([, pid]) => pid === me?.id);
   const currentPlayer = state.players[state.current];
-  const pendingTile = state.pendingBuy != null ? TILES[state.pendingBuy] : null;
+  const pendingTile = state.pendingBuy != null ? map.tiles[state.pendingBuy] : null;
   const canAfford = pendingTile && me && pendingTile.price !== undefined && me.cash >= pendingTile.price;
 
   return (
@@ -96,7 +98,7 @@ export default function Board({ blurred = false, interactive = true }: { blurred
         className="flex-1 grid min-h-0"
         style={{ gridTemplateColumns: 'repeat(11, 1fr)', gridTemplateRows: 'repeat(11, 1fr)', gap: 4 }}
       >
-        {TILES.map((t) => (
+        {map.tiles.map((t) => (
           <TileView
             key={t.id}
             t={t}

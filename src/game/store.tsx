@@ -1,6 +1,8 @@
 import { createContext, useContext, useMemo, useReducer } from 'react';
 import type { ReactNode } from 'react';
-import { TILES, isBuyable } from '../data/tiles';
+import { isBuyable } from '../data/tiles';
+import { MAPS } from '../data/maps';
+import type { MapId } from '../data/maps';
 import { createTurn, tickTurn, rollTurn, endTurn, TurnState } from './turn';
 import { applyMove, buyTile, applyRent, advanceTurn, eliminateIfBankrupt, GameState } from './engine';
 
@@ -55,6 +57,7 @@ interface State {
   rules: Record<string, boolean>;
   mobileTab: MobileTab;
   turn: TurnState;
+  mapId: MapId;
 }
 
 type Action =
@@ -75,6 +78,7 @@ type Action =
   | { type: 'SET_STARTING_CASH'; n: number }
   | { type: 'TOGGLE_RULE'; key: string }
   | { type: 'SET_TAB'; tab: MobileTab }
+  | { type: 'SET_MAP'; mapId: MapId }
   | { type: 'END_TURN' }
   | { type: 'TICK_TURN' };
 
@@ -116,6 +120,7 @@ export const initialState: State = {
   },
   mobileTab: 'board',
   turn: createTurn(),
+  mapId: 'classic',
 };
 
 function joinLog(startingCash: number): LogEntry[] {
@@ -190,7 +195,7 @@ export function reducer(s: State, a: Action): State {
       const events = applyMove(engineState, steps);
 
       const newPos = engineState.players[engineState.current].pos;
-      const tile = TILES[newPos];
+      const tile = MAPS[s.mapId].tiles[newPos];
 
       const log: LogEntry[] = [
         ...s.log,
@@ -220,6 +225,12 @@ export function reducer(s: State, a: Action): State {
         log.push({ id: nid(), text: `${p.name} will spend a turn while on vacation` });
       }
 
+      if (tile.kind === 'refund') {
+        const amount = tile.price ?? 50;
+        engineState.players[engineState.current].cash += amount;
+        log.push({ id: nid(), text: `${p.name} got a $${amount} tax refund` });
+      }
+
       // advanceTurn(engineState);
 
       const updatedPlayers = s.players.map((pl, i) => ({
@@ -244,7 +255,7 @@ export function reducer(s: State, a: Action): State {
       if (s.pendingBuy == null) return s;
 
       const tileId = s.pendingBuy;
-      const tile = TILES[tileId];
+      const tile = MAPS[s.mapId].tiles[tileId];
 
       const engineState: GameState = {
         players: s.players.map(pl => ({ name: pl.name, cash: pl.cash, pos: pl.pos, out: !!pl.isOut })),
@@ -342,6 +353,8 @@ export function reducer(s: State, a: Action): State {
       return { ...s, rules: { ...s.rules, [a.key]: !s.rules[a.key] } };
     case 'SET_TAB':
       return { ...s, mobileTab: a.tab };
+    case 'SET_MAP':
+      return { ...s, mapId: a.mapId, owned: {}, pendingBuy: null, selected: null };
     case 'TICK_TURN':
       return { ...s, turn: tickTurn(s.turn) };
     case 'END_TURN': {

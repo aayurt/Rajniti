@@ -75,8 +75,7 @@ describe('Store Reducer', () => {
     expect(state.chat[state.chat.length - 1].text).toBe('Hello, world!');
   });
 
-  it('BANKRUPT_ME flags out', () => {
-    let state = reducer(initialState, { type: 'JOIN_GAME' });
+  it('BANKRUPT_ME flags out', () => {    let state = reducer(initialState, { type: 'JOIN_GAME' });
 
     // The "you" player is player 1 in the dummy setup
     const meIndex = state.players.findIndex(p => p.isYou);
@@ -86,5 +85,35 @@ describe('Store Reducer', () => {
 
     expect(state.players[meIndex].isOut).toBe(true);
     expect(state.players[meIndex].cash).toBe(0);
+  });
+
+  it('SET_MAP switches board and clears ownership', () => {
+    let state = reducer(initialState, { type: 'JOIN_GAME' });
+    expect(state.mapId).toBe('classic');
+    state = reducer(state, { type: 'SET_MAP', mapId: 'deathvalley' });
+    expect(state.mapId).toBe('deathvalley');
+    expect(state.owned).toEqual({});
+    expect(state.pendingBuy).toBe(null);
+  });
+
+  it('JOIN_GAME preserves the selected map', () => {
+    let state = reducer(initialState, { type: 'SET_MAP', mapId: 'luckywheel' });
+    state = reducer(state, { type: 'JOIN_GAME' });
+    expect(state.mapId).toBe('luckywheel');
+  });
+
+  it('landing on Tax Refund pays the bonus', () => {
+    let state = reducer(initialState, { type: 'JOIN_GAME' });
+    state = {
+      ...state,
+      mapId: 'luckywheel',
+      players: state.players.map((pl, i) => (i === 0 ? { ...pl, pos: 35 } : pl)),
+    };
+    const before = state.players[0].cash;
+    state = reducer(state, { type: 'ROLL', d1: 1, d2: 1 });
+    state = reducer(state, { type: 'LANDED' });
+    expect(state.players[0].pos).toBe(37);
+    expect(state.players[0].cash).toBe(before + 50);
+    expect(state.log[state.log.length - 1].text).toContain('tax refund');
   });
 });

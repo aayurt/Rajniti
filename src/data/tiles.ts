@@ -5,6 +5,7 @@ export type TileKind =
   | 'airport'
   | 'utility'
   | 'tax'
+  | 'refund'
   | 'treasure'
   | 'surprise'
   | 'prison-pass'

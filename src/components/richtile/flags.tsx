@@ -1,7 +1,7 @@
 // Inline SVG circle flags (reference renders flags as SVG, never emoji).
-export type FlagCode = 'br' | 'cn' | 'de' | 'fr' | 'gb' | 'hu' | 'il' | 'us';
+export type FlagCode = 'br' | 'cn' | 'de' | 'fr' | 'gb' | 'hu' | 'il' | 'us' | 'in' | 'jp' | 'ca' | 'tr' | 'ro' | 'ie' | 'it';
 
-export const FLAG_CODES: FlagCode[] = ['br', 'cn', 'de', 'fr', 'gb', 'hu', 'il', 'us'];
+export const FLAG_CODES: FlagCode[] = ['br', 'cn', 'de', 'fr', 'gb', 'hu', 'il', 'us', 'in', 'jp', 'ca', 'tr', 'ro', 'ie', 'it'];
 
 const EMOJI_MAP: Record<string, FlagCode> = {
   '🇧🇷': 'br',
@@ -12,6 +12,13 @@ const EMOJI_MAP: Record<string, FlagCode> = {
   '🇭🇺': 'hu',
   '🇮🇱': 'il',
   '🇺🇸': 'us',
+  '🇮🇳': 'in',
+  '🇯🇵': 'jp',
+  '🇨🇦': 'ca',
+  '🇹🇷': 'tr',
+  '🇷🇴': 'ro',
+  '🇮🇪': 'ie',
+  '🇮🇹': 'it',
 };
 
 export function flagCodeFromEmoji(flag: string | undefined): FlagCode | undefined {
@@ -33,13 +40,13 @@ function Circle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Star({ x, y, r }: { x: number; y: number; r: number }) {
+function Star({ x, y, r, fill = '#ffda44' }: { x: number; y: number; r: number; fill?: string }) {
   const pts = Array.from({ length: 10 }, (_, i) => {
     const a = (Math.PI / 5) * i - Math.PI / 2;
     const rr = i % 2 === 0 ? r : r * 0.42;
     return `${(x + rr * Math.cos(a)).toFixed(2)},${(y + rr * Math.sin(a)).toFixed(2)}`;
   }).join(' ');
-  return <polygon points={pts} fill="#ffda44" />;
+  return <polygon points={pts} fill={fill} />;
 }
 
 const ART: Record<FlagCode, React.ReactNode> = {
@@ -106,6 +113,60 @@ const ART: Record<FlagCode, React.ReactNode> = {
         <rect key={i} y={(i * 24) / 13} width="24" height={24 / 13} fill="#b31942" />
       ))}
       <rect width="11" height={24 * (7 / 13)} fill="#0a3161" />
+    </>
+  ),
+  in: (
+    <>
+      <rect width="24" height="8" fill="#FF9933" />
+      <rect y="8" width="24" height="8" fill="#fff" />
+      <rect y="16" width="24" height="8" fill="#138808" />
+      <circle cx="12" cy="12" r="2.4" fill="none" stroke="#000080" strokeWidth="0.9" />
+    </>
+  ),
+  jp: (
+    <>
+      <rect width="24" height="24" fill="#fff" />
+      <circle cx="12" cy="12" r="5.5" fill="#BC0023" />
+    </>
+  ),
+  ca: (
+    <>
+      <rect width="6.5" height="24" fill="#d80621" />
+      <rect x="6.5" width="11" height="24" fill="#fff" />
+      <rect x="17.5" width="6.5" height="24" fill="#d80621" />
+      <polygon
+        points="12,7 13.2,10 16,10 13.8,12 14.8,15 12,13.4 9.2,15 10.2,12 8,10 10.8,10"
+        fill="#d80621"
+      />
+    </>
+  ),
+  tr: (
+    <>
+      <rect width="24" height="24" fill="#E30A17" />
+      <circle cx="10" cy="12" r="5.5" fill="#fff" />
+      <circle cx="11.2" cy="12" r="4.4" fill="#E30A17" />
+      <Star x={15.6} y={12} r={1.7} fill="#fff" />
+    </>
+  ),
+  ro: (
+    <>
+      <rect width="8" height="24" fill="#002B7F" />
+      <rect x="8" width="8" height="24" fill="#FCD116" />
+      <rect x="16" width="8" height="24" fill="#CE1126" />
+    </>
+  ),
+  ie: (
+    <>
+      <rect width="8" height="24" fill="#169B62" />
+      <rect x="8" width="8" height="24" fill="#fff" />
+      <rect x="16" width="8" height="24" fill="#FF883E" />
+    </>
+  ),
+  it: (
+    <>
+      <rect width="8" height="24" fill="#009246" />
+      <rect x="8" width="8" height="24" fill="#fff" />
+      <rect x="16" width="8" height="24" fill="#CE2B37" />
     </>
   ),
 };

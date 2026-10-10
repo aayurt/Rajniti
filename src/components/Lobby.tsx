@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../game/store';
 import LeftPanel from './LeftPanel';
 import Board from './Board';
+import MapBrowser from './MapBrowser';
+import Character from './richtile/Character';
+import { MAPS } from '../data/maps';
 import { SETTINGS, GAMEPLAY_RULES, LOBBY_COPY } from './lobby/content';
 
 const APPEARANCES = [
@@ -19,6 +22,7 @@ function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
 export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' | 'full' | 'exclusive' }) {
   const { state, dispatch } = useGame();
   const [updating, setUpdating] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
 
   const handleUpdate = (action: any) => {
     dispatch(action);
@@ -83,13 +87,12 @@ export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' |
                     <button
                       key={c}
                       onClick={() => dispatch({ type: 'SET_APPEARANCE', color: c })}
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-xl min-w-[48px] min-h-[48px] ${
+                      className={`w-12 h-12 rounded-full flex items-center justify-center min-w-[48px] min-h-[48px] ${
                         active ? 'ring-4 ring-white/70 scale-110' : ''
                       }`}
-                      style={{ background: c }}
                       aria-label={`Appearance ${c}`}
                     >
-                      {active && <span className="text-xl">👀</span>}
+                      <Character color={c} size={48} />
                     </button>
                   );
                 })}
@@ -161,8 +164,13 @@ export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' |
               <div className="text-xs text-fog">{SETTINGS.boardMap.desc}</div>
             </div>
             <div className="text-right">
-              <div className="text-sm font-semibold">{SETTINGS.boardMap.classic}</div>
-              <div className="text-xs text-lav">{SETTINGS.boardMap.browse} ›</div>
+              <div className="text-sm font-semibold">{MAPS[state.mapId].name}</div>
+              <button
+                onClick={() => setMapOpen(true)}
+                className="text-xs text-lav min-h-[44px]"
+              >
+                {SETTINGS.boardMap.browse} ›
+              </button>
             </div>
           </div>
 
@@ -209,6 +217,16 @@ export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' |
           <div className="absolute bottom-4 right-4 bg-black/80 text-white text-xs px-3 py-2 rounded-lg flex items-center gap-2">
             <span className="animate-spin">↻</span> {LOBBY_COPY.updating}
           </div>
+        )}
+        {mapOpen && (
+          <MapBrowser
+            current={state.mapId}
+            onSelect={(id) => {
+              dispatch({ type: 'SET_MAP', mapId: id });
+              setMapOpen(false);
+            }}
+            onClose={() => setMapOpen(false)}
+          />
         )}
       </div>
     </div>

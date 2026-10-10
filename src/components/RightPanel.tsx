@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import { TILES } from '../data/tiles';
+import { MAPS } from '../data/maps';
 import { useGame } from '../game/store';
 import { TradeModal, tradeReducer, initialTradeState } from './TradeModal';
 import { tradeCopy } from './panels/copy';
@@ -13,7 +13,7 @@ export default function RightPanel() {
   const myTiles = Object.keys(state.owned)
     .map(Number)
     .filter((id) => state.owned[id] === me?.id)
-    .map((id) => TILES[id]);
+    .map((id) => MAPS[state.mapId].tiles[id]);
 
   const bankrupt = () => {
     if (window.confirm('Go bankrupt? You will leave the game.')) dispatch({ type: 'BANKRUPT_ME' });
