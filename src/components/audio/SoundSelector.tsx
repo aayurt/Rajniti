@@ -36,7 +36,7 @@ export default function SoundSelector() {
       </div>
 
       <div className="flex flex-col items-center gap-2 my-4">
-{['classic', 'funny', 'got'].map((pack: SoundPackName) => {
+{(['classic', 'funny', 'got'] as const).map((pack: SoundPackName) => {
           const active = state.sound.pack === pack;
           return (
             <button
