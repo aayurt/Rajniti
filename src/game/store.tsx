@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { TILES, isBuyable } from '../data/tiles';
 import { createTurn, tickTurn, rollTurn, endTurn, TurnState } from './turn';
 import { applyMove, buyTile, applyRent, advanceTurn, eliminateIfBankrupt, GameState } from './engine';
+import { SoundEvent, SoundPackName } from '../audio/types';
 
 export interface Player {
   id: string;
@@ -55,6 +56,11 @@ interface State {
   rules: Record<string, boolean>;
   mobileTab: MobileTab;
   turn: TurnState;
+  sound: {
+    enabled: boolean;
+    volume: number;
+    pack: SoundPackName;
+  };
 }
 
 type Action =
@@ -76,7 +82,10 @@ type Action =
   | { type: 'TOGGLE_RULE'; key: string }
   | { type: 'SET_TAB'; tab: MobileTab }
   | { type: 'END_TURN' }
-  | { type: 'TICK_TURN' };
+  | { type: 'TICK_TURN' }
+  | { type: 'SET_SOUND_ENABLED'; enabled: boolean }
+  | { type: 'SET_SOUND_VOLUME'; volume: number }
+  | { type: 'SET_SOUND_PACK'; pack: SoundPackName };
 
 let uid = 1;
 const nid = () => uid++;
@@ -116,6 +125,11 @@ export const initialState: State = {
   },
   mobileTab: 'board',
   turn: createTurn(),
+  sound: {
+    enabled: true,
+    volume: 100,
+    pack: 'classic',
+  },
 };
 
 function joinLog(startingCash: number): LogEntry[] {
@@ -342,6 +356,12 @@ export function reducer(s: State, a: Action): State {
       return { ...s, rules: { ...s.rules, [a.key]: !s.rules[a.key] } };
     case 'SET_TAB':
       return { ...s, mobileTab: a.tab };
+    case 'SET_SOUND_ENABLED':
+      return { ...s, sound: { ...s.sound, enabled: a.enabled } };
+    case 'SET_SOUND_VOLUME':
+      return { ...s, sound: { ...s.sound, volume: Math.max(0, Math.min(100, a.volume)) } };
+    case 'SET_SOUND_PACK':
+      return { ...s, sound: { ...s.sound, pack: a.pack } };
     case 'TICK_TURN':
       return { ...s, turn: tickTurn(s.turn) };
     case 'END_TURN': {

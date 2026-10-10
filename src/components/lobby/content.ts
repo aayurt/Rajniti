@@ -26,6 +26,14 @@ export const SETTINGS = {
   randomOrder: {
     title: 'Randomize player order',
     desc: 'Randomly reorder players at the beginning of the game'
+  },
+  sound: {
+    title: 'Sound',
+    desc: 'Enable or disable game sounds'
+  },
+  soundPack: {
+    title: 'Sound pack',
+    desc: 'Select a sound pack for game events'
   }
 };
 
