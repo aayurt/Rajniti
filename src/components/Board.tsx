@@ -3,6 +3,7 @@ import { tileArea, isBuyable } from '../data/tiles';
 import type { Tile } from '../data/tiles';
 import { MAPS } from '../data/maps';
 import { useGame } from '../game/store';
+import { soundEngine } from '../audio/soundEngine';
 import Dice from './Dice';
 import RichTile from './richtile/RichTile';
 import type { RichOrient } from './richtile/RichTile';
@@ -82,6 +83,7 @@ export default function Board({ blurred = false, interactive = true }: { blurred
     const d1 = 1 + Math.floor(Math.random() * 6);
     const d2 = 1 + Math.floor(Math.random() * 6);
     dispatch({ type: 'ROLL', d1, d2 });
+    soundEngine.play('rollDice');
     timer.current = window.setTimeout(() => dispatch({ type: 'LANDED' }), 650);
   };
 

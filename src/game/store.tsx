@@ -5,6 +5,8 @@ import { MAPS } from '../data/maps';
 import type { MapId } from '../data/maps';
 import { createTurn, tickTurn, rollTurn, endTurn, TurnState } from './turn';
 import { applyMove, buyTile, applyRent, advanceTurn, eliminateIfBankrupt, GameState } from './engine';
+import { SoundEvent, SoundPackName } from '../audio/types';
+import { soundEngine } from '../audio/soundEngine';
 
 export interface Player {
   id: string;
@@ -58,6 +60,11 @@ interface State {
   mobileTab: MobileTab;
   turn: TurnState;
   mapId: MapId;
+  sound: {
+    enabled: boolean;
+    volume: number;
+    pack: SoundPackName;
+  };
 }
 
 type Action =
@@ -80,7 +87,11 @@ type Action =
   | { type: 'SET_TAB'; tab: MobileTab }
   | { type: 'SET_MAP'; mapId: MapId }
   | { type: 'END_TURN' }
-  | { type: 'TICK_TURN' };
+  | { type: 'PLAY_BOT_TURN' }
+  | { type: 'TICK_TURN' }
+  | { type: 'SET_SOUND_ENABLED'; enabled: boolean }
+  | { type: 'SET_SOUND_VOLUME'; volume: number }
+  | { type: 'SET_SOUND_PACK'; pack: SoundPackName };
 
 let uid = 1;
 const nid = () => uid++;
@@ -121,6 +132,11 @@ export const initialState: State = {
   mobileTab: 'board',
   turn: createTurn(),
   mapId: 'classic',
+  sound: {
+    enabled: true,
+    volume: 100,
+    pack: 'classic',
+  },
 };
 
 function joinLog(startingCash: number): LogEntry[] {
@@ -172,6 +188,18 @@ export function reducer(s: State, a: Action): State {
       if (s.rolling || s.turn.phase !== 'awaitRoll') return s;
       return { ...s, rolling: true, dice: [a.d1, a.d2], pendingBuy: null, turn: rollTurn(s.turn) };
     case 'LANDED': {
+      // Sync sound engine state with game state
+      soundEngine.setState({
+        enabled: s.sound.enabled,
+        volume: s.sound.volume,
+        pack: s.sound.pack,
+      });
+
+      // Play move step sound
+      if (s.sound.enabled) {
+        soundEngine.play('moveStep');
+      }
+
       const moverIndex = s.current;
       const p = s.players[moverIndex];
       const steps = s.dice[0] + s.dice[1];
@@ -212,6 +240,9 @@ export function reducer(s: State, a: Action): State {
       for (const ev of rentEvents) {
         if (ev.type === 'rent') {
           log.push({ id: nid(), text: ev.message });
+          if (s.sound.enabled) {
+            soundEngine.play('payRent');
+          }
         }
       }
 
@@ -272,6 +303,11 @@ export function reducer(s: State, a: Action): State {
 
       const events = buyTile(engineState, tileId);
       const buyEvent = events.find(e => e.type === 'buy');
+
+      // Play buy property sound
+      if (buyEvent && s.sound.enabled) {
+        soundEngine.play('buyProperty');
+      }
 
       if (!buyEvent) {
         const errorEvent = events.find(e => e.type === 'error');
@@ -355,6 +391,12 @@ export function reducer(s: State, a: Action): State {
       return { ...s, mobileTab: a.tab };
     case 'SET_MAP':
       return { ...s, mapId: a.mapId, owned: {}, pendingBuy: null, selected: null };
+    case 'SET_SOUND_ENABLED':
+      return { ...s, sound: { ...s.sound, enabled: a.enabled } };
+    case 'SET_SOUND_VOLUME':
+      return { ...s, sound: { ...s.sound, volume: Math.max(0, Math.min(100, a.volume)) } };
+    case 'SET_SOUND_PACK':
+      return { ...s, sound: { ...s.sound, pack: a.pack } };
     case 'TICK_TURN':
       return { ...s, turn: tickTurn(s.turn) };
     case 'END_TURN': {
@@ -372,6 +414,27 @@ export function reducer(s: State, a: Action): State {
       }
       advanceTurn(engineState);
       return { ...s, current: engineState.current, turn: createTurn(), pendingBuy: null };
+    }
+    case 'PLAY_BOT_TURN': {
+      const engineState: GameState = {
+        players: s.players.map(pl => ({ name: pl.name, cash: pl.cash, pos: pl.pos, out: !!pl.isOut })),
+        current: s.current,
+        owners: {},
+      };
+      for (const pos in s.owned) {
+        const ownerId = s.owned[pos];
+        const idx = s.players.findIndex(pl => pl.id === ownerId);
+        if (idx !== -1) {
+          engineState.owners[pos] = idx;
+        }
+      }
+      advanceTurn(engineState);
+      return {
+        ...s,
+        current: engineState.current,
+        turn: createTurn(),
+        pendingBuy: null,
+      };
     }
     default:
       return s;

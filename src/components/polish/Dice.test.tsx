@@ -32,4 +32,22 @@ describe('Dice', () => {
     const pips = container.querySelectorAll('.pip');
     expect(pips.length).toBe(5);
   });
+
+  it('applies disabled class when disabled prop is true', () => {
+    const { container } = render(<Dice value={1} disabled={true} />);
+    const diceDiv = container.firstChild as HTMLElement;
+    expect(diceDiv.className).toContain('disabled');
+  });
+
+  it('reduces opacity when disabled prop is true', () => {
+    const { container } = render(<Dice value={1} disabled={true} />);
+    const diceDiv = container.firstChild as HTMLElement;
+    expect(diceDiv.style.opacity).toBe('0.5');
+  });
+
+  it('does not apply rolling class when disabled prop is true', () => {
+    const { container } = render(<Dice value={1} rolling={true} disabled={true} />);
+    const diceDiv = container.firstChild as HTMLElement;
+    expect(diceDiv.className).not.toContain('rolling');
+  });
 });

@@ -70,11 +70,57 @@ body {
 
 .rich-bar {
   position: absolute;
-  top: 0;
+  z-index: 1;
+}
+
+.richup-block-bottom .rich-bar {
+  top: auto;
+  bottom: 0;
   left: 0;
   right: 0;
-  height: 8px;
+  height: 5px;
+  width: auto;
+  border-radius: 0 0 0.5em 0.5em;
+}
+
+.richup-block-top .rich-bar {
+  top: 0;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  height: 5px;
+  width: auto;
   border-radius: 0.5em 0.5em 0 0;
+}
+
+.richup-block-left .rich-bar {
+  top: 0;
+  bottom: 0;
+  left: auto;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  border-radius: 0 0.5em 0.5em 0;
+}
+
+.richup-block-right .rich-bar {
+  top: 0;
+  bottom: 0;
+  left: auto;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  border-radius: 0 0.5em 0.5em 0;
+}
+
+.richup-block-left .rich-icon {
+  display: inline-block;
+  transform: rotate(-90deg);
+}
+
+.richup-block-right .rich-icon {
+  display: inline-block;
+  transform: rotate(90deg);
 }
 
 /* Orientation: the tile box stays in horizontal flow so grid sizing is exact;
