@@ -10,11 +10,12 @@ const PIPS: Record<number, [number, number][]> = {
 interface DiceProps {
   value: number;
   rolling?: boolean;
+  disabled?: boolean;
   size?: number;
   className?: string;
 }
 
-export default function Dice({ value, rolling, size = 92, className = '' }: DiceProps) {
+export default function Dice({ value, rolling, disabled, size = 92, className = '' }: DiceProps) {
   const baseStyle: React.CSSProperties = {
     width: `${size}px`,
     height: `${size}px`,
@@ -23,7 +24,8 @@ export default function Dice({ value, rolling, size = 92, className = '' }: Dice
     position: 'relative',
     boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6), inset 0 2px 4px #fff',
     flexShrink: 0,
-    transform: rolling ? undefined : 'rotate(-8deg)',
+    opacity: disabled ? 0.5 : 1,
+    transform: disabled ? 'rotate(-8deg)' : (rolling ? undefined : 'rotate(-8deg)'),
   };
 
   const pipSize = size * 0.152;
@@ -31,7 +33,7 @@ export default function Dice({ value, rolling, size = 92, className = '' }: Dice
 
   return (
     <div
-      className={`dice-3d ${rolling ? 'rolling' : ''} ${className}`}
+      className={`dice-3d ${rolling && !disabled ? 'rolling' : ''} ${disabled && 'disabled'} ${className}`}
       data-testid="dice"
       style={baseStyle}
     >
