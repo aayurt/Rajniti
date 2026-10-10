@@ -101,30 +101,18 @@ describe('Store Reducer', () => {
     expect(state.current).toBe(1);
   });
 
-  it('PLAY_BOT_TURN wraps around to the first player when at the end', () => {
+it('PLAY_BOT_TURN wraps around to the first player when at the end', () => {
     let state = reducer(initialState, { type: 'JOIN_GAME' });
 
     state = reducer(state, { type: 'ROLL', d1: 3, d2: 4 });
     state = reducer(state, { type: 'LANDED' });
 
-    // Set current to the last player (index 3 for 4 BASE_PLAYERS)
-    // But we only have 4 base players, so current 3 is the last
-    state = reducer(state, { type: 'END_TURN' });
-    state = reducer(state, { type: 'END_TURN' });
-    state = reducer(state, { type: 'END_TURN' });
-    // Now current should be 0 after wrapping, but let's verify
-
-    // Actually let's just test the wrap scenario differently
-    state = reducer(initialState, { type: 'JOIN_GAME' });
-    // Force current to 2 (the third player)
-    // We can't easily set current directly in this test structure,
-    // so we'll test the wrap with END_TURN from position 2
+    // Advance turn 3 times to reach the last player (index 3 out of 4)
+    state = reducer(state, { type: 'END_TURN' }); // 0→1
+    state = reducer(state, { type: 'END_TURN' }); // 1→2
     state = reducer(state, { type: 'END_TURN' }); // 2→3
-    state = reducer(state, { type: 'END_TURN' }); // 3→0 (wrap)
-    expect(state.current).toBe(0);
 
-    // Now test PLAY_BOT_TURN from position 0
     state = reducer(state, { type: 'PLAY_BOT_TURN' });
-    expect(state.current).toBe(1);
+    expect(state.current).toBe(0); // wraps around
   });
 });
