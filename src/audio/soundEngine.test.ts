@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 
 import { soundEngine } from './soundEngine';
 import { SoundEvent } from './types';
+import { allPackNames } from './packs';
 
 vi.spyOn(console, 'log');
 
