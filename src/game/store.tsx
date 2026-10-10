@@ -4,6 +4,7 @@ import { TILES, isBuyable } from '../data/tiles';
 import { createTurn, tickTurn, rollTurn, endTurn, TurnState } from './turn';
 import { applyMove, buyTile, applyRent, advanceTurn, eliminateIfBankrupt, GameState } from './engine';
 import { SoundEvent, SoundPackName } from '../audio/types';
+import { soundEngine } from '../audio/soundEngine';
 
 export interface Player {
   id: string;
@@ -181,6 +182,18 @@ export function reducer(s: State, a: Action): State {
       if (s.rolling || s.turn.phase !== 'awaitRoll') return s;
       return { ...s, rolling: true, dice: [a.d1, a.d2], pendingBuy: null, turn: rollTurn(s.turn) };
     case 'LANDED': {
+      // Sync sound engine state with game state
+      soundEngine.setState({
+        enabled: s.sound.enabled,
+        volume: s.sound.volume,
+        pack: s.sound.pack,
+      });
+
+      // Play move step sound
+      if (s.sound.enabled) {
+        soundEngine.play('moveStep');
+      }
+
       const moverIndex = s.current;
       const p = s.players[moverIndex];
       const steps = s.dice[0] + s.dice[1];
@@ -221,6 +234,9 @@ export function reducer(s: State, a: Action): State {
       for (const ev of rentEvents) {
         if (ev.type === 'rent') {
           log.push({ id: nid(), text: ev.message });
+          if (s.sound.enabled) {
+            soundEngine.play('payRent');
+          }
         }
       }
 
@@ -275,6 +291,11 @@ export function reducer(s: State, a: Action): State {
 
       const events = buyTile(engineState, tileId);
       const buyEvent = events.find(e => e.type === 'buy');
+
+      // Play buy property sound
+      if (buyEvent && s.sound.enabled) {
+        soundEngine.play('buyProperty');
+      }
 
       if (!buyEvent) {
         const errorEvent = events.find(e => e.type === 'error');
