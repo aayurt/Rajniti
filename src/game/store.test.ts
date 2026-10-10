@@ -87,4 +87,32 @@ describe('Store Reducer', () => {
     expect(state.players[meIndex].isOut).toBe(true);
     expect(state.players[meIndex].cash).toBe(0);
   });
+
+  it('PLAY_BOT_TURN advances the turn to the next player', () => {
+    let state = reducer(initialState, { type: 'JOIN_GAME' });
+
+    state = reducer(state, { type: 'ROLL', d1: 3, d2: 4 });
+    state = reducer(state, { type: 'LANDED' });
+
+    expect(state.current).toBe(0);
+    expect(state.players[0].pos).toBe(7);
+
+    state = reducer(state, { type: 'PLAY_BOT_TURN' });
+    expect(state.current).toBe(1);
+  });
+
+it('PLAY_BOT_TURN wraps around to the first player when at the end', () => {
+    let state = reducer(initialState, { type: 'JOIN_GAME' });
+
+    state = reducer(state, { type: 'ROLL', d1: 3, d2: 4 });
+    state = reducer(state, { type: 'LANDED' });
+
+    // Advance turn 3 times to reach the last player (index 3 out of 4)
+    state = reducer(state, { type: 'END_TURN' }); // 0→1
+    state = reducer(state, { type: 'END_TURN' }); // 1→2
+    state = reducer(state, { type: 'END_TURN' }); // 2→3
+
+    state = reducer(state, { type: 'PLAY_BOT_TURN' });
+    expect(state.current).toBe(0); // wraps around
+  });
 });
