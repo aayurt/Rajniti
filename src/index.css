@@ -97,6 +97,10 @@ body {
 .dice-3d.rolling {
   animation: shake 0.5s ease infinite;
 }
+.dice-3d.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* ---------- Toggle Switch ---------- */
 .toggle {
