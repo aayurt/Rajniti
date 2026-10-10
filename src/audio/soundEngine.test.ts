@@ -69,7 +69,14 @@ describe('SoundEngine', () => {
   });
 
   it('supports all pack names', () => {
-    // Just verify the packs are defined
+    const events: SoundEvent[] = ['rollDice', 'moveStep', 'buyProperty', 'payRent', 'jail', 'win', 'bankrupt'];
+
+    for (const packName of allPackNames) {
+      const engine = soundEngine.createFromState({ enabled: true, volume: 100, pack: packName });
+      for (const event of events) {
+        engine.play(event);
+      }
+    }
   });
 
   it('plays all sound events', () => {
