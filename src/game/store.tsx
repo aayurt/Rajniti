@@ -82,6 +82,7 @@ type Action =
   | { type: 'TOGGLE_RULE'; key: string }
   | { type: 'SET_TAB'; tab: MobileTab }
   | { type: 'END_TURN' }
+  | { type: 'PLAY_BOT_TURN' }
   | { type: 'TICK_TURN' }
   | { type: 'SET_SOUND_ENABLED'; enabled: boolean }
   | { type: 'SET_SOUND_VOLUME'; volume: number }
@@ -379,6 +380,27 @@ export function reducer(s: State, a: Action): State {
       }
       advanceTurn(engineState);
       return { ...s, current: engineState.current, turn: createTurn(), pendingBuy: null };
+    }
+    case 'PLAY_BOT_TURN': {
+      const engineState: GameState = {
+        players: s.players.map(pl => ({ name: pl.name, cash: pl.cash, pos: pl.pos, out: !!pl.isOut })),
+        current: s.current,
+        owners: {},
+      };
+      for (const pos in s.owned) {
+        const ownerId = s.owned[pos];
+        const idx = s.players.findIndex(pl => pl.id === ownerId);
+        if (idx !== -1) {
+          engineState.owners[pos] = idx;
+        }
+      }
+      advanceTurn(engineState);
+      return {
+        ...s,
+        current: engineState.current,
+        turn: createTurn(),
+        pendingBuy: null,
+      };
     }
     default:
       return s;
