@@ -5,6 +5,7 @@ import Board from './Board';
 import { APPEARANCES } from './appearance/skins';
 import { SETTINGS, GAMEPLAY_RULES, LOBBY_COPY } from './lobby/content';
 import { SoundPackName } from '../audio/types';
+import { allPackNames } from '../audio/packs';
 
 const RULE_ICONS = ['🪙', '🏖️', '🔨', '📉', '🤲', '🏘️'];
 
@@ -199,8 +200,8 @@ export default function Lobby({ roomState = 'normal' }: { roomState?: 'normal' |
               onChange={(e) => dispatch({ type: 'SET_SOUND_PACK', pack: e.target.value as SoundPackName })}
               className="bg-tile border border-line rounded-md px-2 py-2 text-sm min-h-[44px]"
             >
-              {[2, 3, 4, 5, 6].map((n) => (
-                <option key={n} value={n}>{n}</option>
+              {allPackNames.map((pack) => (
+                <option key={pack} value={pack}>{pack}</option>
               ))}
             </select>
           </div>
